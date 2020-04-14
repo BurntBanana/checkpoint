@@ -14,12 +14,42 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "checkPointExplorerView",
+					"title": "CheckPoint",
+					"icon": "resouces/activityBar.svg"
+				}
+			]
+		},
+		"views": {
+			"checkPointExplorerView": [
+				{
+					"id": "checkPointExplorer",
+					"name": "CheckPoint Explorer"
+				}
+			]
+		},
 		"commands": [
 			{
-				"command": "checkpoint.helloWorld",
-				"title": "Hello World"
+				"command": "checkPointExplorer.refreshEntry",
+				"title": "Refresh",
+				"icon": {
+					"light": "resources/checkPointIcon.svg",
+					"dark": "resources/checkPointIcon.svg"
+				}
 			}
-		]
+		],
+		"menus": {
+			"view/item/context": [
+				{
+					"command": "checkPointExplorer.watch",
+					"when": "view == fileExplorer && viewItem == file",
+					"group": "inline"
+				}
+			]
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
