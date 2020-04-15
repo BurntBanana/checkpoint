@@ -49,6 +49,10 @@
 				}
 			},
 			{
+				"command": "checkPointExplorer.openFile",
+				"title": "Reconstruct file at checkpoint"
+			},
+			{
 				"command": "checkPointExplorer.deleteCheckPoint",
 				"title": "Delete a particular Check Point",
 				"icon": {
