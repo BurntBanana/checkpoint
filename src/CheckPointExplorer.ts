@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
-import {CheckPointObject, CheckPointTreeItem} from './Interfaces/CheckPointInterfaces'
+import {CheckPointObject, CheckPointTreeItem} from './Interfaces/CheckPointInterfaces';
 import * as path from 'path';
+import {diff_match_patch, patch_obj} from 'diff-match-patch';
+
 
 class CheckPointTreeItemImpl implements CheckPointTreeItem {
     constructor (public timestamp: Date, public index: number) {
@@ -25,7 +27,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         this.checkPointObject = this.checkPointContext.globalState.get(fileName, {} as CheckPointObject);
         //On file save
         vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {	
-            this.saveCheckPoint();
+            this.saveCheckPoint(document);
         });
 
         //on Active editor switch
@@ -34,8 +36,31 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         });
     }
     
-    private saveCheckPoint() {
+    private saveCheckPoint(document: vscode.TextDocument) {
+        // if(!context.globalState.get(document.fileName)) {
+		// 	let value: PatchObject = {
+		// 		patches:[],
+		// 		current: document.getText()
+		// 	};
+		// 	console.log("First save");
+		// 	context.globalState.update(document.fileName, value);
+		// }
+		// else {
+		// 	console.log("patching");
+		// 	//context.globalState.update(document.fileName, "");
+		// 	const dmp = new diff_match_patch();
+		// 	let value = context.globalState.get(document.fileName, {} as PatchObject);
+			
+		// 	console.log(value.current);
+		// 	let file1 = value.current;
+		// 	let file2 = document.getText();
+		// 	console.log(file2);
 
+		// 	let patch:patch_obj[] = dmp.patch_make(file2, file1);
+		// 	value.patches.push(patch);
+		// 	value.current = file2;
+        //     context.globalState.update(document.fileName, value);
+        // }
     }
 
     private activeEditorChange() {
@@ -70,6 +95,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
 export class CheckPointExplorer {
     private checkPointExplorer: vscode.TreeView<CheckPointTreeItem>;
     constructor(context: vscode.ExtensionContext) {
+        console.log("CheckPoint constructor");
         const treeDataProvider = new CheckPointProvider(context);
         this.checkPointExplorer = vscode.window.createTreeView('checkPointExplorer', { treeDataProvider });
     }

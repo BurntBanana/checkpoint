@@ -10,7 +10,7 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:checkpoint.helloWorld"
+		"onView:checkPointExplorer"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -19,7 +19,7 @@
 				{
 					"id": "checkPointExplorerContainer",
 					"title": "CheckPoint",
-					"icon": "resouces/activityBar.svg"
+					"icon": "resources/activityBar.svg"
 				}
 			]
 		},
