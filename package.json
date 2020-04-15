@@ -14,17 +14,6 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"configuration": {
-			"title": "checkpoint",
-			"properties": {
-			  "checkpoint.enabled": {
-				"type": "boolean",
-				"scope": "resource",
-				"description": "%config.enabled%",
-				"default": true
-			  }
-			}
-		},
 		"viewsContainers": {	
 			"activitybar": [
 				{
