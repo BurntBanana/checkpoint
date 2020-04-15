@@ -25,11 +25,36 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         this.onDidChangeTreeData = this._onDidChangeTreeData.event;
         this.checkPointContext = context;
         this.checkPointObject = currentFileCheckPointObject;
+
+        vscode.commands.registerCommand('checkPointExplorer.openFile', (index) => this.openCheckPoint(index));
     
         //On file save
         vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {	
             this.saveCheckPoint(document);
         });
+    }
+
+    private openCheckPoint(index: number) {
+        const dmp = new diff_match_patch();
+        let prev = this.checkPointObject.current;
+        if (index === 0) {
+            var setting: vscode.Uri = vscode.Uri.parse("untitled:" + "tmp:\summary.txt");
+            vscode.workspace.openTextDocument(setting).then((a: vscode.TextDocument) => {
+                vscode.window.showTextDocument(a, 1, false).then(e => {
+                    e.edit(edit => {
+                    edit.insert(new vscode.Position(0, 0), this.checkPointObject.patches[0] as string);
+                });
+            });
+            console.log()
+            }, (error: any) => {
+                console.error(error);
+                debugger;
+            });
+        }
+        // for(let i = this.checkPointObject.patches.length-1; i > 0; i--) {
+        //     prev = dmp.patch_apply(this.checkPointObject.patches[i], prev)[0];
+        //     console.log("Previous: " + i + " " + prev);
+        // }
     }
     
     private saveCheckPoint(document: vscode.TextDocument) {
@@ -66,11 +91,13 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         return result;
     }
     getTreeItem(element: CheckPointTreeItem): vscode.TreeItem {
-        console.log("Called get item for", element);
         const treeItem = new vscode.TreeItem(element.timestamp.toLocaleString());
         let resourcePath: string = path.join(__filename, '..', '..', 'resources','/checkPointIcon.svg');
+        treeItem.contextValue = "checkPointItem";
         treeItem.iconPath = {light: resourcePath, dark: resourcePath};
         treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
+        console.log(element.index);
+        treeItem.command = { command: 'checkPointExplorer.openFile', title: "Open File", arguments: [element.index], };
 		return treeItem;
 
     }
@@ -94,6 +121,7 @@ export class CheckPointExplorer {
         vscode.window.onDidChangeActiveTextEditor((document : vscode.TextEditor | undefined) => {
             this.activeEditorChange(document);
         });
+        
     }
     initCheckPointExplorer(currentFileCheckPointObject : CheckPointObject | undefined) {
         if (currentFileCheckPointObject) {
