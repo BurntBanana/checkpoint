@@ -17,24 +17,54 @@
 		"viewsContainers": {
 			"activitybar": [
 				{
-					"id": "checkPointExplorerView",
+					"id": "checkPointExplorerContainer",
 					"title": "CheckPoint",
 					"icon": "resouces/activityBar.svg"
 				}
 			]
 		},
 		"views": {
-			"checkPointExplorerView": [
+			"checkPointExplorerContainer": [
 				{
 					"id": "checkPointExplorer",
 					"name": "CheckPoint Explorer"
 				}
 			]
 		},
+		"viewsWelcome": [
+			{
+			  "view": "checkPointExplorer",
+			  "contents": "No Check Points found [learn more](https://www.npmjs.com/).\n[Commence tracking](command:checkPointExplorer.commenceTracking)"
+			}
+		],
 		"commands": [
 			{
-				"command": "checkPointExplorer.refreshEntry",
-				"title": "Refresh",
+				"command": "checkPointExplorer.commenceTracking",
+				"title": "Commence tracking of current file",
+				"icon": {
+					"light": "resources/checkPointIcon.svg",
+					"dark": "resources/checkPointIcon.svg"
+				}
+			},
+			{
+				"command": "checkPointExplorer.deleteCheckPoint",
+				"title": "Delete a particular Check Point",
+				"icon": {
+					"light": "resources/checkPointIcon.svg",
+					"dark": "resources/checkPointIcon.svg"
+				}
+			},
+			{
+				"command": "checkPointExplorer.deleteAllCheckPoints",
+				"title": "Delete all Check Points of current file",
+				"icon": {
+					"light": "resources/checkPointIcon.svg",
+					"dark": "resources/checkPointIcon.svg"
+				}
+			},
+			{
+				"command": "checkPointExplorer.exportCheckPoints",
+				"title": "Export the Check Points of current file",
 				"icon": {
 					"light": "resources/checkPointIcon.svg",
 					"dark": "resources/checkPointIcon.svg"
@@ -42,10 +72,22 @@
 			}
 		],
 		"menus": {
+			"view/title": [
+				{
+					"command": "checkPointExplorer.deleteAllCheckPoints",
+					"when": "view == checkPointExplorer",
+					"group": "navigation"
+				},
+				{
+					"command": "checkPointExplorer.exportCheckPoints",
+					"when": "view == checkPointExplorer",
+					"group": "navigation"
+				}
+			],
 			"view/item/context": [
 				{
-					"command": "checkPointExplorer.watch",
-					"when": "view == fileExplorer && viewItem == file",
+					"command": "checkPointExplorer.deleteCheckPoint",
+					"when": "view == checkPointExplorer && viewItem == checkPointItem",
 					"group": "inline"
 				}
 			]
