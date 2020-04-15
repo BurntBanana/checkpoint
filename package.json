@@ -14,7 +14,18 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"viewsContainers": {
+		"configuration": {
+			"title": "checkpoint",
+			"properties": {
+			  "checkpoint.enabled": {
+				"type": "boolean",
+				"scope": "resource",
+				"description": "%config.enabled%",
+				"default": true
+			  }
+			}
+		},
+		"viewsContainers": {	
 			"activitybar": [
 				{
 					"id": "checkPointExplorerContainer",
@@ -27,14 +38,16 @@
 			"checkPointExplorerContainer": [
 				{
 					"id": "checkPointExplorer",
-					"name": "CheckPoint Explorer"
+					"name": "CheckPoint Explorer",
+					"when": ""
 				}
 			]
 		},
 		"viewsWelcome": [
 			{
 			  "view": "checkPointExplorer",
-			  "contents": "No Check Points found [learn more](https://www.npmjs.com/).\n[Commence tracking](command:checkPointExplorer.commenceTracking)"
+			  "contents": "No Check Points found [learn more](https://www.npmjs.com/).\n[Commence tracking](command:checkPointExplorer.commenceTracking)",
+			  "when": "config.checkpoint.enabled"
 			}
 		],
 		"commands": [
