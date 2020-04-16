@@ -19,7 +19,7 @@
                 "checkpoint.interval": {
                     "type": "number",
                     "scope": "application",
-                    "default": 4,
+                    "default": 10,
                     "description": "Interval to save full file content."
 				}
 			}
