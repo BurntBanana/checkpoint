@@ -14,6 +14,16 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"configuration": {
+            "properties": {
+                "checkpoint.interval": {
+                    "type": "number",
+                    "scope": "application",
+                    "default": 4,
+                    "description": "Interval to save full file content."
+				}
+			}
+		},
 		"viewsContainers": {	
 			"activitybar": [
 				{
@@ -34,8 +44,7 @@
 		"viewsWelcome": [
 			{
 			  "view": "checkPointExplorer",
-			  "contents": "No Check Points found [learn more](https://www.npmjs.com/).\n[Commence tracking](command:checkPointExplorer.commenceTracking)",
-			  "when": "config.checkpoint.enabled"
+			  "contents": "No Check Points found [learn more](https://www.npmjs.com/).\n[Commence tracking](command:checkPointExplorer.commenceTracking)"
 			}
 		],
 		"commands": [
