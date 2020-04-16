@@ -101,6 +101,10 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
 		return treeItem;
 
     }
+    updateCheckPointObject(checkPointObject: CheckPointObject) {
+        this.checkPointObject = checkPointObject;
+        this._onDidChangeTreeData.fire();
+    }
 }
 
 
@@ -134,7 +138,8 @@ export class CheckPointExplorer {
 
     private deleteCheckPoints() {
         this.checkPointExplorerContext.globalState.update(vscode.window.activeTextEditor?.document.fileName as string, null);
-        this.createDataProvider(false);
+        //this.createDataProvider(false);
+        this.treeDataProvider?.updateCheckPointObject({} as CheckPointObject);
     }
     private openProviderCheckPoint(index: number) {
         this.treeDataProvider?.openCheckPoint(index);
