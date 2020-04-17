@@ -15,16 +15,16 @@
 	"main": "./out/extension.js",
 	"contributes": {
 		"configuration": {
-            "properties": {
-                "checkpoint.interval": {
-                    "type": "number",
-                    "scope": "application",
-                    "default": 10,
-                    "description": "Interval to save full file content."
+			"properties": {
+				"checkpoint.interval": {
+					"type": "number",
+					"scope": "application",
+					"default": 10,
+					"description": "Interval to save full file content."
 				}
 			}
 		},
-		"viewsContainers": {	
+		"viewsContainers": {
 			"activitybar": [
 				{
 					"id": "checkPointExplorerContainer",
@@ -40,11 +40,12 @@
 					"name": "CheckPoint Explorer",
 					"when": ""
 				}
-			]},
+			]
+		},
 		"viewsWelcome": [
 			{
-			  "view": "checkPointExplorer",
-			  "contents": "No Check Points found [learn more](https://www.npmjs.com/).\n[Commence tracking](command:checkPointExplorer.commenceTracking)"
+				"view": "checkPointExplorer",
+				"contents": "No Check Points found [learn more](https://www.npmjs.com/).\n[Commence tracking](command:checkPointExplorer.commenceTracking)"
 			}
 		],
 		"commands": [
@@ -129,7 +130,9 @@
 		"vscode-test": "^1.3.0"
 	},
 	"dependencies": {
+		"@types/dateformat": "^3.0.1",
 		"@types/diff-match-patch": "^1.0.32",
+		"dateformat": "^3.0.3",
 		"diff-match-patch": "^1.0.4"
 	}
 }
