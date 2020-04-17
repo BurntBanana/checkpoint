@@ -19,9 +19,10 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
     private checkPointContext: vscode.ExtensionContext;
     private checkPointObject: CheckPointObject; 
     private interval: number;
+    private checkPointSelected : boolean;
 
     private closestCheckPoint = (index : number) => {
-        return (Math.ceil(index/this.interval) * this.interval);
+        return (Math.floor(index/this.interval) * this.interval);
     };
     
     constructor(context: vscode.ExtensionContext, currentFileCheckPointObject: CheckPointObject) {
@@ -31,69 +32,68 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         this.checkPointContext = context;
         this.checkPointObject = currentFileCheckPointObject;
         this.interval = vscode.workspace.getConfiguration("checkpoint").get("interval") || 4;
-
-        if(Object.keys(currentFileCheckPointObject).length !== 0) {
-            vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {	
-                this.saveCheckPoint(document);
-            });
-        }
+        this.checkPointSelected = false;
     }
     private editorTest(checkPointData : string) {
+
     
         const { activeTextEditor } = vscode.window;
+        // activeTextEditor?.edit(builder => {
+        //     const { document } = activeTextEditor;
+        //     let total_lines = document.lineCount;
+        //     let last_char = document.getWordRangeAtPosition(new vscode.Position(total_lines, 0))?.end.character;
+        //     let currentRange = new vscode.Range(new vscode.Position(0,0), new vscode.Position(total_lines,last_char as number))
+        //     builder.replace(currentRange, checkPointData);
+        // });
         if (activeTextEditor) {
             const { document } = activeTextEditor;
             if (document) {
                 const textEdits: vscode.TextEdit[] = [];
                 let total_lines = document.lineCount;
-                let last_char = document.getWordRangeAtPosition(new vscode.Position(total_lines, 0))?.end.character;
+                let last_char = document.lineAt(total_lines - 1).rangeIncludingLineBreak.end.character;                
                 let test_rng: vscode.Range = new vscode.Range(new vscode.Position(0,0), new vscode.Position(total_lines,last_char as number));
                 textEdits.push(vscode.TextEdit.delete(test_rng));
                 textEdits.push(vscode.TextEdit.insert(new vscode.Position(0,0), checkPointData));
- 
                 const workEdits = new vscode.WorkspaceEdit();
                 workEdits.set(document.uri, textEdits); // give the edits
                 vscode.workspace.applyEdit(workEdits); // apply the edits
             }
+            this.checkPointSelected = true;
         }
     }
 
     public openCheckPoint(index: number) {
 
         //if file is unsaved, make checkpoint and proceeed
-        this.saveCheckPoint(vscode.window.activeTextEditor?.document as vscode.TextDocument);
+        this.saveCheckPoint(vscode.window.activeTextEditor?.document as vscode.TextDocument, this.checkPointSelected);
 
         const dmp = new diff_match_patch();
         let generatedFile:string;
         let patchIndex:number;
 
-        if (this.checkPointObject.patches.length < this.closestCheckPoint(index)) {
-            generatedFile = this.checkPointObject.current as string;
-            patchIndex = this.checkPointObject.patches.length - 1;
+        patchIndex = this.closestCheckPoint(index) + 1;
+        generatedFile = this.checkPointObject.patches[this.closestCheckPoint(index)] as string;
+        
+        for(let i = patchIndex; i <= index; i++) {
+            generatedFile = dmp.patch_apply(this.checkPointObject.patches[i] as patch_obj[], generatedFile)[0];
         }
-        else {
-            generatedFile = this.checkPointObject.patches[this.closestCheckPoint(index)] as string;
-            patchIndex = this.closestCheckPoint(index) - 1;
-        }
-        if(index !== patchIndex)
-        {
-            for(let i = patchIndex; i > index; i--) {
-                generatedFile = dmp.patch_apply(this.checkPointObject.patches[i] as patch_obj[], generatedFile)[0];
-            }
-        }
-        console.log(generatedFile);
         this.editorTest(generatedFile);
 
 
     }
     
-    public saveCheckPoint(document: vscode.TextDocument) {
+    public saveCheckPoint(document: vscode.TextDocument, check: boolean = false) {
 
         const currentFile : string = document.getText();
+        console.log(currentFile);
         let previousFile = this.checkPointObject.current;
+        console.log(previousFile);
         //if both files are same
-        if (currentFile === previousFile) {
+        if (check || currentFile === previousFile) {
             return;
+        }
+        else {
+            this.checkPointSelected = false;
         }
        
         //check whether to store patch or file
@@ -101,10 +101,12 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
             this.checkPointObject.patches.push(currentFile);
         }
         else {
+
             const dmp = new diff_match_patch();
             let previousFile = this.checkPointObject.current;
-            let patch:patch_obj[] = dmp.patch_make(currentFile, previousFile);
+            let patch:patch_obj[] = dmp.patch_make(previousFile, currentFile);
             this.checkPointObject.patches.push(patch);
+            
         }
 
         this.checkPointObject.current = currentFile;
@@ -158,7 +160,12 @@ export class CheckPointExplorer {
         vscode.commands.registerCommand('checkPointExplorer.openFile', (index) => this.openProviderCheckPoint(index));
         vscode.commands.registerCommand('checkPointExplorer.deleteAllCheckPoints', () => this.deleteCheckPoints());
 
-        
+        vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {	
+            if(this.treeDataProvider) {
+                this.treeDataProvider.saveCheckPoint(document);
+            }
+            
+        });
         
         //on Active editor switch
         vscode.window.onDidChangeActiveTextEditor((documentEditor : vscode.TextEditor | undefined) => {
@@ -194,7 +201,7 @@ export class CheckPointExplorer {
     //         this.treeDataProvider?.saveCheckPoint(textDocument);
     //     }
     // }
-
+    
 
     private createDataProvider(initialise : boolean){
         this.treeDataProvider = undefined;
