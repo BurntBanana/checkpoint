@@ -65,16 +65,16 @@
 				"command": "checkPointExplorer.deleteCheckPoint",
 				"title": "Delete a particular Check Point",
 				"icon": {
-					"light": "resources/checkPointIcon.svg",
-					"dark": "resources/checkPointIcon.svg"
+					"light": "resources/garbage.svg",
+					"dark": "resources/garbage.svg"
 				}
 			},
 			{
 				"command": "checkPointExplorer.deleteAllCheckPoints",
 				"title": "Delete all Check Points of current file",
 				"icon": {
-					"light": "resources/checkPointIcon.svg",
-					"dark": "resources/checkPointIcon.svg"
+					"light": "resources/garbage.svg",
+					"dark": "resources/garbage.svg"
 				}
 			},
 			{
@@ -104,7 +104,7 @@
 					"command": "checkPointExplorer.deleteCheckPoint",
 					"when": "view == checkPointExplorer && viewItem == checkPointItem",
 					"group": "inline"
-				}
+				}	
 			]
 		}
 	},
