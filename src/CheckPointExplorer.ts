@@ -13,7 +13,7 @@ class CheckPointObjectImpl implements CheckPointObject {
 
 //TreeViewImplementation
 export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTreeItem> {
-
+    private dmp: diff_match_patch;
     private _onDidChangeTreeData: vscode.EventEmitter<CheckPointTreeItem>;
     onDidChangeTreeData: vscode.Event<CheckPointTreeItem>;
     private checkPointContext: vscode.ExtensionContext;
@@ -33,10 +33,9 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         this.checkPointObject = currentFileCheckPointObject;
         this.interval = vscode.workspace.getConfiguration("checkpoint").get("interval") || 4;
         this.checkPointSelected = false;
+        this.dmp = new diff_match_patch();
     }
-    private editorTest(checkPointData : string) {
-
-    
+    private editorUpdate(checkPointData : string) {
         const { activeTextEditor } = vscode.window;
         if (activeTextEditor) {
             const { document } = activeTextEditor;
@@ -56,12 +55,11 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
     }
 
     public openCheckPoint(index: number) {
-        const dmp = new diff_match_patch();
         const document = vscode.window.activeTextEditor?.document;
         //if file is unsaved, make checkpoint and proceeed
         if (document) {
             this.saveCheckPoint(vscode.window.activeTextEditor?.document as vscode.TextDocument, this.checkPointSelected);
-            this.editorTest(this.generateFileByPatch(index));
+            this.editorUpdate(this.generateFileByPatch(index));
         }
     }
 
@@ -88,9 +86,8 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
             this.checkPointObject.patches.push(currentFile);
         }
         else {
-            const dmp = new diff_match_patch();
             let previousFile = this.checkPointObject.current;
-            let patch:patch_obj[] = dmp.patch_make(previousFile, currentFile);
+            let patch:patch_obj[] = this.dmp.patch_make(previousFile, currentFile);
             this.checkPointObject.patches.push(patch);
         }
 
@@ -120,7 +117,6 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         treeItem.contextValue = "checkPointItem";
         treeItem.iconPath = {light: resourcePath, dark: resourcePath};
         treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
-        // console.log(element.index);
         treeItem.command = { command: 'checkPointExplorer.openFile', title: "Open File", arguments: [element.index], };
 		return treeItem;
 
@@ -138,7 +134,6 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
     }
 
     deleteSingleCheckPoint(index : number){
-        const dmp = new diff_match_patch();
         let generatedFile : string = "";
 
         //only one checkpoint
@@ -155,34 +150,27 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         }
         else {
             generatedFile = this.generateFileByPatch(index - 1);
-            this.checkPointObject.patches[index + 1] = dmp.patch_make(generatedFile, this.generateFileByPatch(index + 1));
+            this.checkPointObject.patches[index + 1] = this.dmp.patch_make(generatedFile, this.generateFileByPatch(index + 1));
         }
         this.checkPointObject.patches.splice(index, 1);
         this.checkPointObject.timestamps.splice(index, 1);
-        // console.log(generatedFile);
 
         for(let k = index; k < this.checkPointObject.patches.length; k++){
             if(k === this.closestCheckPoint(k)){
-                this.checkPointObject.patches[k] = dmp.patch_apply(this.checkPointObject.patches[k] as patch_obj[], generatedFile)[0];
+                this.checkPointObject.patches[k] = this.dmp.patch_apply(this.checkPointObject.patches[k] as patch_obj[], generatedFile)[0];
             }
             else if(k === this.closestCheckPoint(k+1) -1){
-                this.checkPointObject.patches[k] = dmp.patch_make(generatedFile, this.checkPointObject.patches[k] as string);
+                this.checkPointObject.patches[k] = this.dmp.patch_make(generatedFile, this.checkPointObject.patches[k] as string);
             }
             generatedFile = this.generateFileByPatch(k);
-            // console.log(generatedFile);
         }
-        // this._onDidChangeTreeData.fire();
-        //this.checkPointContext.globalState.update(vscode.window.activeTextEditor?.document.fileName as string, this.checkPointObject);
         this.updateCheckPointObject(this.checkPointObject);
-        // console.log(generateFileByPatch(patches, interval, patches.length - 1));
     }
 
     private generateFileByPatch(index : number) : string {
-        const dmp = new diff_match_patch();
         let generatedFile : string = this.checkPointObject.patches[this.closestCheckPoint(index)] as string;
         for(let i = this.closestCheckPoint(index) + 1; i<= index; i++){
-            // generatedFile = applyPatch(generatedFile, patches[i]);
-            generatedFile = dmp.patch_apply(this.checkPointObject.patches[i] as patch_obj[], generatedFile)[0];
+            generatedFile = this.dmp.patch_apply(this.checkPointObject.patches[i] as patch_obj[], generatedFile)[0];
         }
         return generatedFile;
     }
@@ -195,7 +183,6 @@ export class CheckPointExplorer {
     private treeDataProvider: CheckPointProvider | undefined = undefined;
 
     constructor(context: vscode.ExtensionContext) {
-        // console.log("CheckPoint constructor");
         this.checkPointExplorerContext = context;
         
         this.createDataProvider();
@@ -234,7 +221,6 @@ export class CheckPointExplorer {
         if (textEditor) {
             let currentFileCheckPointObject = this.checkPointExplorerContext.globalState.get(textEditor.document.fileName || "") || {} as CheckPointObject;
             this.treeDataProvider?.updateCheckPointObject(currentFileCheckPointObject as CheckPointObject)
-            //this.createDataProvider(false);
         }
         
     }
