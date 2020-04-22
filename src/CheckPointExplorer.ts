@@ -1,10 +1,47 @@
 import * as vscode from 'vscode';
 import {CheckPointObject, CheckPointTreeItem} from './Interfaces/CheckPointInterfaces';
-import * as path from 'path';
+import {join} from 'path';
 import {diff_match_patch, patch_obj} from 'diff-match-patch';
 import * as dateFormat from 'dateformat';
-import { resolve } from 'dns';
+import {createLogger, transports, Logger, format} from 'winston'; 
+import { LEVEL, MESSAGE } from 'triple-beam';
 
+let logger: Logger;
+
+export function initLogger(logPath:string):Logger {
+
+    const options =  {
+        transports: [   
+            new transports.File({ filename: join(logPath, "checkpoint_log.log")}),
+            new transports.Console({
+                log(info, callback) {
+                  if (this.stderrLevels?[info[LEVEL]]:"") {
+                    console.error(info[MESSAGE]);
+                    if (callback) {
+                      callback();
+                    }
+                    return;
+                  }
+                  console.log(info[MESSAGE]);
+                  if (callback) {
+                    callback();
+                  }
+                }
+              })
+        ],
+        format: format.combine(
+            format.colorize(),
+            format.timestamp({
+              format: 'YYYY-MM-DD HH:mm:ss'
+            }),
+            format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
+        ),
+        exceptionHandlers: [
+            new transports.File({ filename: join(logPath, "checkpoint_error.log") })
+        ]
+    };
+    return createLogger(options);
+}
 /**
  * Concrete class to initialise CheckPointTreeItem objects
  * @param timestamp Date of checkpoint creation
@@ -48,7 +85,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
     private checkPointSelected : boolean;
 
     /** Set if active checkpoint has been set */
-    private saveForActive : boolean = false;
+    private saveForActive : boolean;
 
     /**
      * Returns the closest file checkpoint
@@ -70,9 +107,11 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         this.checkPointContext = context;
         this.checkPointObject = currentFileCheckPointObject;
         this.interval = vscode.workspace.getConfiguration("checkpoint").get("interval") || 4;
+        logger.info("Checkpoint interval has been set to: " + this.interval);
         this.checkPointSelected = false;
+        logger.info("Initialising diff patch match object");
         this.dmp = new diff_match_patch();
-        //this.saveForActive = false;
+        this.saveForActive = false;
     }
 
     /**
@@ -94,6 +133,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
                     const workEdits = new vscode.WorkspaceEdit();
                     workEdits.set(document.uri, textEdits); // give the edits
                     vscode.workspace.applyEdit(workEdits).then(() => {
+                        logger.info("Active document text changed");
                         this.checkPointSelected = true; //set checkpoint as selected
                         resolve(true);
                     }); // apply the edits
@@ -108,6 +148,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      * @param index [number](#number) Index of selected checkpoint
      */
     public openCheckPoint(index: number) {
+        logger.info("Checkpoint " + index + " selected");
         return new Promise(resolve => {
             const document = vscode.window.activeTextEditor?.document;
             //if file is unsaved, make checkpoint and proceeed
@@ -127,7 +168,6 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      * @param calledByOpen [boolean](#boolean) Set to true if checkpoint is opened
      */
     public saveCheckPoint(document: vscode.TextDocument, calledByOpen: boolean = false) {
-
         //check for save as
         if (this.saveForActive || vscode.window.activeTextEditor?.document.fileName !== document.fileName) {
             return;
@@ -159,7 +199,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         
         //set new checkpoint as active
         this.checkPointObject.active = this.checkPointObject.patches.length - 1;
-        
+        logger.info("Checkpoint " + this.checkPointObject.active + " created for: " + document.fileName);
         this.updateCheckPointObject(this.checkPointObject);
     }
     /**
@@ -188,7 +228,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      */
     getTreeItem(element: CheckPointTreeItem): vscode.TreeItem {
         const treeItem = new vscode.TreeItem(dateFormat(element.timestamp));
-        let resourcePath: string = path.join(__filename, '..', '..', 'resources', element.index === this.checkPointObject.active ? '/garbage.svg' : '/checkPointIcon.svg');
+        let resourcePath: string = join(__filename, '..', '..', 'resources', element.index === this.checkPointObject.active ? '/garbage.svg' : '/checkPointIcon.svg');
         treeItem.contextValue = "checkPointItem";
         treeItem.iconPath = {light: resourcePath, dark: resourcePath};
         treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
@@ -205,13 +245,16 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      */
     updateCheckPointObject(checkPointObject: CheckPointObject) : void{
         //If passed object is empty, update null value in globalState.
+        const fileName = vscode.window.activeTextEditor?.document.fileName;
+        logger.info("Updated checkpoint data for: " + fileName);
         if (Object.keys(checkPointObject).length === 0) {
-            this.checkPointContext.globalState.update(vscode.window.activeTextEditor?.document.fileName || "", null);
+            this.checkPointContext.globalState.update(fileName || "", null);
         }
         else {
-            this.checkPointContext.globalState.update(vscode.window.activeTextEditor?.document.fileName || "", checkPointObject);
+            this.checkPointContext.globalState.update(fileName || "", checkPointObject);
         }
         this.checkPointObject = checkPointObject;
+        logger.info("Refreshing tree");
         this._onDidChangeTreeData.fire();
     }
 
@@ -224,7 +267,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      */
     deleteSingleCheckPoint(index : number) : void{
         let generatedFile : string = "";
-
+        logger.info("Deleing checkpoint: " + index);
         //If there is only a single CheckPoint in the view.
         if (this.checkPointObject.patches.length === 1 && index === 0) {
             this.updateCheckPointObject({} as CheckPointObject);
@@ -272,6 +315,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      *
      */
     private generateFileByPatch(index : number) : string {
+        logger.info("Generating file for checkpoint: " + index);
         let generatedFile : string = this.checkPointObject.patches[this.closestCheckPoint(index)] as string;
         for(let i = this.closestCheckPoint(index) + 1; i<= index; i++){
             generatedFile = this.dmp.patch_apply(this.checkPointObject.patches[i] as patch_obj[], generatedFile)[0];
@@ -284,6 +328,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      * @param index - The index of the CheckPoint to be set active.
      */
     setActiveCheckPoint(index: number) {
+        logger.info("Active checkpoint set to: " + index);
         this.checkPointObject.active = index;
         this.openCheckPoint(index).then(() => {
             this.saveForActive = true;
@@ -318,9 +363,11 @@ export class CheckPointExplorer {
      * @param context - The `ExtensionContext` object that is to be used to store globalState.
      *
      */
-    constructor(context: vscode.ExtensionContext){
-        this.checkPointExplorerContext = context;
+    constructor(context: vscode.ExtensionContext, loggerNew:Logger){
+        this.checkPointExplorerContext = context;        
+        logger = loggerNew;
         this.createDataProvider();
+        logger.info("Registering commands");
         vscode.commands.registerCommand('checkPointExplorer.commenceTracking', () => this.commenceTracking());
         vscode.commands.registerCommand('checkPointExplorer.openFile', (index) => this.openProviderCheckPoint(index));
         vscode.commands.registerCommand('checkPointExplorer.deleteAllCheckPoints', () => this.deleteCheckPoints());
@@ -330,13 +377,19 @@ export class CheckPointExplorer {
         vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {	
             if(this.treeDataProvider) {
                 this.treeDataProvider.saveCheckPoint(document);
+            } else {
+                logger.warn("Data Provider not initialised");
             }
             
         });
         
         //Handle active editor switch events.
         vscode.window.onDidChangeActiveTextEditor((documentEditor : vscode.TextEditor | undefined) => {
-            this.activeEditorChange(documentEditor);
+            logger.info("Active editor switched to: " + documentEditor?.document.fileName);
+            if (documentEditor) {
+                let currentFileCheckPointObject = this.checkPointExplorerContext.globalState.get(documentEditor.document.fileName || "") || {} as CheckPointObject;
+                this.treeDataProvider?.updateCheckPointObject(currentFileCheckPointObject as CheckPointObject);
+            }
         });
         
     }
@@ -352,6 +405,9 @@ export class CheckPointExplorer {
     private deleteSingleCheckPoint(element : CheckPointTreeItem) : void{
        if(this.treeDataProvider){
            this.treeDataProvider?.deleteSingleCheckPoint(element.index);
+       } 
+       else {
+           logger.warn("Data Provider not initialised");
        }
     }
 
@@ -363,6 +419,7 @@ export class CheckPointExplorer {
      *
      */
     private deleteCheckPoints() : void {
+        logger.info("Deleting all checkpoints");
         this.treeDataProvider?.updateCheckPointObject({} as CheckPointObject);
     }
 
@@ -379,22 +436,6 @@ export class CheckPointExplorer {
     }
 
     /**
-     * Method to handle `ActiveTextEditor` changes by user.
-     * Initiated by the `onDidChangeActiveTextEditor` event trigger.
-     * 
-     * @param textEditor - The current `TextEditor` object to which the view was changed to.
-     * @returns void.
-     *
-     */
-    private activeEditorChange(textEditor : vscode.TextEditor | undefined) : void {
-        if (textEditor) {
-            let currentFileCheckPointObject = this.checkPointExplorerContext.globalState.get(textEditor.document.fileName || "") || {} as CheckPointObject;
-            this.treeDataProvider?.updateCheckPointObject(currentFileCheckPointObject as CheckPointObject);
-        }
-        
-    }
-
-    /**
      * Method to initiate CheckPoint tracking for a file which is currently untracked.
      * Initiated by the `commenceTracking` command.
      * 
@@ -402,8 +443,10 @@ export class CheckPointExplorer {
      *
      */
     private commenceTracking() : void {
-        const currentDocumentText : string | undefined = vscode.window.activeTextEditor?.document.getText();
-        if (currentDocumentText) {
+        const currentDocument : vscode.TextDocument | undefined = vscode.window.activeTextEditor?.document;
+        logger.info("Starting file tracking for: " + currentDocument);
+        if (currentDocument) {
+            const currentDocumentText = currentDocument.getText();
             let currentFileCheckPointObject = new CheckPointObjectImpl([currentDocumentText as string], [new Date(Date.now())], currentDocumentText as string, 0);
             this.treeDataProvider?.updateCheckPointObject(currentFileCheckPointObject as CheckPointObject);
         }
@@ -416,10 +459,12 @@ export class CheckPointExplorer {
      *
      */
     private createDataProvider() : void{
+        logger.info("Creating tree data provider");
         let current_document : vscode.TextDocument | undefined = vscode.window.activeTextEditor?.document;
         let currentFileCheckPointObject = this.checkPointExplorerContext.globalState.get(current_document?.fileName || "") || undefined;
         
         if(!currentFileCheckPointObject){
+            logger.info("No checkpoints found for: " + current_document);
             currentFileCheckPointObject = {} as CheckPointObject;
         }
         this.treeDataProvider = new CheckPointProvider(this.checkPointExplorerContext, currentFileCheckPointObject as CheckPointObject);
