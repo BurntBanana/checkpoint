@@ -4,27 +4,61 @@ import * as path from 'path';
 import {diff_match_patch, patch_obj} from 'diff-match-patch';
 import * as dateFormat from 'dateformat';
 
+/**
+ * Concrete class to initialise CheckPointTreeItem objects
+ * @param timestamp Date of checkpoint creation
+ * @param index Index of Tree item
+ * */
 class CheckPointTreeItemImpl implements CheckPointTreeItem {
     constructor (public timestamp: Date, public index: number) {}
 }
+/**
+ * Concrete class to initialise CheckPointObject objects
+ * @param patches Array of patch or file
+ * @param timestamps Array of date objects
+ * @param current Current text content of file
+ * */
 class CheckPointObjectImpl implements CheckPointObject {
     constructor (public patches: Array<patch_obj[]|string>, public timestamps: Array<Date>, public current: string) {}
 }
 
-//TreeViewImplementation
+/**
+	 * Represents TreeDataProvider implementation
+*/
 export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTreeItem> {
-    private dmp: diff_match_patch;
+    /**diff-patch-match object */
+    private dmp: diff_match_patch; 
+
+    /*** Event to signal that an element or root has changed.*/
     private _onDidChangeTreeData: vscode.EventEmitter<CheckPointTreeItem>;
+
     onDidChangeTreeData: vscode.Event<CheckPointTreeItem>;
+
+    /** Global context object */
     private checkPointContext: vscode.ExtensionContext;
+
+    /** Current active CheckPoint object */
     private checkPointObject: CheckPointObject; 
-    private interval: number;
+
+    /** Interval to store file in patches array */
+    private interval: number;   
+
+    /** Set if checkpoint is currently in selection */
     private checkPointSelected : boolean;
 
+    /**
+     * Returns the closest file checkpoint
+     * @param index Index whose closest checkpoint is to be computed
+     * @returns [number](#number) Closest checkpoint 
+     */
     private closestCheckPoint = (index : number) => {
         return (Math.floor(index/this.interval) * this.interval);
     };
-    
+
+    /**
+     * @param context Application context
+     * @param currentFileCheckPointObject CheckPointObject for the current active file
+     * */
     constructor(context: vscode.ExtensionContext, currentFileCheckPointObject: CheckPointObject) {
         //update TreeView event
         this._onDidChangeTreeData = new vscode.EventEmitter<CheckPointTreeItem>();
@@ -35,6 +69,11 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         this.checkPointSelected = false;
         this.dmp = new diff_match_patch();
     }
+
+    /**
+     * Update the current text editor to show file at selected checkpoints
+     * @param checkPointData [string](#string) File content at checkpoint
+     */
     private editorUpdate(checkPointData : string) {
         const { activeTextEditor } = vscode.window;
         if (activeTextEditor) {
@@ -50,19 +89,29 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
                 workEdits.set(document.uri, textEdits); // give the edits
                 vscode.workspace.applyEdit(workEdits); // apply the edits
             }
-            this.checkPointSelected = true;
+    
+            this.checkPointSelected = true; //set checkpoint as selected
         }
     }
 
+    /**
+     * Triggered when checkpoint is clicked on UI
+     * @param index [number](#number) Index of selected checkpoint
+     */
     public openCheckPoint(index: number) {
         const document = vscode.window.activeTextEditor?.document;
         //if file is unsaved, make checkpoint and proceeed
         if (document) {
-            this.saveCheckPoint(vscode.window.activeTextEditor?.document as vscode.TextDocument, this.checkPointSelected);
+            this.saveCheckPoint(vscode.window.activeTextEditor?.document as vscode.TextDocument, this.checkPointSelected); 
             this.editorUpdate(this.generateFileByPatch(index));
         }
     }
 
+    /**
+     * Triggered when file is saved
+     * @param document [vscode.TextDocument](#vscode.TextDocument) document which is saved
+     * @param check [boolean](#boolean) Set to true if checkpoint is opened
+     */
     public saveCheckPoint(document: vscode.TextDocument, check: boolean = false) {
 
         //check for save as
@@ -73,7 +122,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         const currentFile : string = document.getText();
         let previousFile = this.checkPointObject.current;
 
-        //if both files are same
+        //if both files are same or checkpoint is opened
         if (check || currentFile === previousFile) {
             return;
         }
@@ -93,11 +142,15 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
 
         this.checkPointObject.current = currentFile;
         this.checkPointObject.timestamps.push(new Date(Date.now()));
-        //this.checkPointContext.globalState.update(document.fileName, this.checkPointObject);
-        //this._onDidChangeTreeData.fire();
+        
         this.updateCheckPointObject(this.checkPointObject);
     }
-    
+    /**
+     * Get the children of CheckPointObject
+     *
+     * @param element The element from which the provider gets children. Can be `undefined`.
+     * @return TreeItems generated from CheckPointObject
+     */
     async getChildren(element?: CheckPointTreeItem): Promise<CheckPointTreeItem[]> {
         let result: Array<CheckPointTreeItem> = [];
         if (Object.keys(this.checkPointObject).length === 0) {
