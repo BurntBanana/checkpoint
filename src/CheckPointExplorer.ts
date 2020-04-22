@@ -164,6 +164,11 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         }
         return result;
     }
+     /**
+     *Method to display tree element from `CheckPointTreeItem` object.
+     * @param element CheckPointTreeItem object.
+     * @return TreeItem generated from CheckPointTreeItem
+     */
     getTreeItem(element: CheckPointTreeItem): vscode.TreeItem {
         const treeItem = new vscode.TreeItem(dateFormat(element.timestamp));
         let resourcePath: string = path.join(__filename, '..', '..', 'resources','/checkPointIcon.svg');
