@@ -9,7 +9,8 @@ import {patch_obj} from 'diff-match-patch';
 export interface CheckPointObject {
     patches: Array<patch_obj[]|string>,
     timestamps: Array<Date>,
-	current: string
+    current: string,
+    active: number
 }
 /**
 	 * @member timestamp Date for the current checkpoint,

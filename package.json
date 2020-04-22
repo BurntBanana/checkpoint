@@ -84,6 +84,14 @@
 					"light": "resources/checkPointIcon.svg",
 					"dark": "resources/checkPointIcon.svg"
 				}
+			},
+			{
+				"command": "checkPointExplorer.setActiveCheckPoint",
+				"title": "Set the Check Point of as active file",
+				"icon": {
+					"light": "resources/checkPointIcon.svg",
+					"dark": "resources/checkPointIcon.svg"
+				}
 			}
 		],
 		"menus": {
@@ -102,6 +110,11 @@
 			"view/item/context": [
 				{
 					"command": "checkPointExplorer.deleteCheckPoint",
+					"when": "view == checkPointExplorer && viewItem == checkPointItem",
+					"group": "inline"
+				},
+				{
+					"command": "checkPointExplorer.setActiveCheckPoint",
 					"when": "view == checkPointExplorer && viewItem == checkPointItem",
 					"group": "inline"
 				}	
