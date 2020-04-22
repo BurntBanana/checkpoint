@@ -121,8 +121,16 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
 		return treeItem;
 
     }
-    updateCheckPointObject(checkPointObject: CheckPointObject) {
-        //if empty object
+
+    /**
+     * Method to update the current CheckPointObject in the globalState and fire an event to update the TreeView.
+     *
+     * @param checkPointObject - The CheckPointObject to be updated.
+     * @returns void
+     *
+     */
+    updateCheckPointObject(checkPointObject: CheckPointObject) : void{
+        //If passed object is empty, update null value in globalState.
         if (Object.keys(checkPointObject).length === 0) {
             this.checkPointContext.globalState.update(vscode.window.activeTextEditor?.document.fileName || "", null);
         }
@@ -133,15 +141,22 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         this._onDidChangeTreeData.fire();
     }
 
-    deleteSingleCheckPoint(index : number){
+    /**
+     * Method to delete the selected CheckPoint.
+     *
+     * @param index - The index of the CheckPoint to be deleted.
+     * @returns void
+     *
+     */
+    deleteSingleCheckPoint(index : number) : void{
         let generatedFile : string = "";
 
-        //only one checkpoint
+        //If there is only a single CheckPoint in the view.
         if (this.checkPointObject.patches.length === 1 && index === 0) {
             this.updateCheckPointObject({} as CheckPointObject);
             return;
         }
-        //last element deleted
+        //If the last element is being deleted.
         if(index === this.checkPointObject.patches.length - 1){
             this.checkPointObject.current = this.generateFileByPatch(index -1);
         }
@@ -150,6 +165,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         }
         else {
             generatedFile = this.generateFileByPatch(index - 1);
+            //Bridge previous and next files by generating a patch.
             this.checkPointObject.patches[index + 1] = this.dmp.patch_make(generatedFile, this.generateFileByPatch(index + 1));
         }
         this.checkPointObject.patches.splice(index, 1);
@@ -157,9 +173,11 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
 
         for(let k = index; k < this.checkPointObject.patches.length; k++){
             if(k === this.closestCheckPoint(k)){
+                //Generate a file by applying patches as current index is now an interval CheckPoint file.
                 this.checkPointObject.patches[k] = this.dmp.patch_apply(this.checkPointObject.patches[k] as patch_obj[], generatedFile)[0];
             }
             else if(k === this.closestCheckPoint(k+1) -1){
+                //Generate a patch as current index is now no longer an interval CheckPoint file.
                 this.checkPointObject.patches[k] = this.dmp.patch_make(generatedFile, this.checkPointObject.patches[k] as string);
             }
             generatedFile = this.generateFileByPatch(k);
@@ -167,6 +185,13 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         this.updateCheckPointObject(this.checkPointObject);
     }
 
+    /**
+     * Method to generate a file at a given index.
+     *
+     * @param index - The index of the CheckPoint to be generated.
+     * @returns generatedFile - string object that contains the actual file state at given index.
+     *
+     */
     private generateFileByPatch(index : number) : string {
         let generatedFile : string = this.checkPointObject.patches[this.closestCheckPoint(index)] as string;
         for(let i = this.closestCheckPoint(index) + 1; i<= index; i++){
@@ -176,20 +201,38 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
     }
 }
 
-
+/**
+ * Class to generate and set the `TreeDataProvider` & `TreeView` for displaying CheckPoints.
+ */
 export class CheckPointExplorer {
+    /**
+     *`TreeView` object to utlize the Tree's data.
+     */
     private checkPointTreeView: vscode.TreeView<CheckPointTreeItem> | undefined = undefined;
+    /**
+     *`ExtensionContext` object to store globalState.
+     */
     private checkPointExplorerContext: vscode.ExtensionContext;
+    /**
+     *`CheckPointProvider` object to store the Tree's data in order to set the `checkPointTreeView` object.
+     */
     private treeDataProvider: CheckPointProvider | undefined = undefined;
 
-    constructor(context: vscode.ExtensionContext) {
+    /**
+     * Constructor method to initialize class members and register commands.
+     *
+     * @param context - The `ExtensionContext` object that is to be used to store globalState.
+     *
+     */
+    constructor(context: vscode.ExtensionContext){
         this.checkPointExplorerContext = context;
-        
         this.createDataProvider();
         vscode.commands.registerCommand('checkPointExplorer.commenceTracking', () => this.commenceTracking());
         vscode.commands.registerCommand('checkPointExplorer.openFile', (index) => this.openProviderCheckPoint(index));
         vscode.commands.registerCommand('checkPointExplorer.deleteAllCheckPoints', () => this.deleteCheckPoints());
         vscode.commands.registerCommand('checkPointExplorer.deleteCheckPoint', (element) => this.deleteSingleCheckPoint(element));
+        
+        //Handle file save events.
         vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {	
             if(this.treeDataProvider) {
                 this.treeDataProvider.saveCheckPoint(document);
@@ -197,34 +240,74 @@ export class CheckPointExplorer {
             
         });
         
-        //on Active editor switch
+        //Handle active editor switch events.
         vscode.window.onDidChangeActiveTextEditor((documentEditor : vscode.TextEditor | undefined) => {
             this.activeEditorChange(documentEditor);
         });
         
     }
 
-    private deleteSingleCheckPoint(element : CheckPointTreeItem) {
+    /**
+     * Method to delete a CheckPoint from the `TreeView`.
+     * Initiated by the `deleteCheckPoint` command.
+     * 
+     * @param element - The `CheckPointTreeItem` object that is provided by the `deleteCheckPoint` command.
+     * @returns void.
+     *
+     */
+    private deleteSingleCheckPoint(element : CheckPointTreeItem) : void{
        if(this.treeDataProvider){
            this.treeDataProvider?.deleteSingleCheckPoint(element.index);
        }
     }
 
-    private deleteCheckPoints() {
+    /**
+     * Method to delete all CheckPoints from the `TreeView`.
+     * Initiated by the `deleteAllCheckPoints` command.
+     * 
+     * @returns void.
+     *
+     */
+    private deleteCheckPoints() : void {
         this.treeDataProvider?.updateCheckPointObject({} as CheckPointObject);
     }
-    private openProviderCheckPoint(index: number) {
+
+    /**
+     * Method to open a CheckPoint in the `ActiveTextEditor`.
+     * Initiated by the `openFile` command.
+     * 
+     * @param index - The index of the CheckPoint to be generated.
+     * @returns void.
+     *
+     */
+    private openProviderCheckPoint(index: number) : void {
         this.treeDataProvider?.openCheckPoint(index);
     }
 
-    private activeEditorChange(textEditor : vscode.TextEditor | undefined) {
+    /**
+     * Method to handle `ActiveTextEditor` changes by user.
+     * Initiated by the `onDidChangeActiveTextEditor` event trigger.
+     * 
+     * @param textEditor - The current `TextEditor` object to which the view was changed to.
+     * @returns void.
+     *
+     */
+    private activeEditorChange(textEditor : vscode.TextEditor | undefined) : void {
         if (textEditor) {
             let currentFileCheckPointObject = this.checkPointExplorerContext.globalState.get(textEditor.document.fileName || "") || {} as CheckPointObject;
-            this.treeDataProvider?.updateCheckPointObject(currentFileCheckPointObject as CheckPointObject)
+            this.treeDataProvider?.updateCheckPointObject(currentFileCheckPointObject as CheckPointObject);
         }
         
     }
-    private commenceTracking() {
+
+    /**
+     * Method to initiate CheckPoint tracking for a file which is currently untracked.
+     * Initiated by the `commenceTracking` command.
+     * 
+     * @returns void.
+     *
+     */
+    private commenceTracking() : void {
         const currentDocumentText : string | undefined = vscode.window.activeTextEditor?.document.getText();
         if (currentDocumentText) {
             let currentFileCheckPointObject = new CheckPointObjectImpl([currentDocumentText as string], [new Date(Date.now())], currentDocumentText as string);
@@ -232,7 +315,13 @@ export class CheckPointExplorer {
         }
     }
 
-    private createDataProvider(){
+    /**
+     * Method to intialize the `treeDataProvider` and `checkPointTreeView` objects.
+     * 
+     * @returns void.
+     *
+     */
+    private createDataProvider() : void{
         let current_document : vscode.TextDocument | undefined = vscode.window.activeTextEditor?.document;
         let currentFileCheckPointObject = this.checkPointExplorerContext.globalState.get(current_document?.fileName || "") || undefined;
         
