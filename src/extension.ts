@@ -9,6 +9,9 @@ import {join} from 'path';
 export function activate(context: vscode.ExtensionContext) {
 	let logger: Logger = initLogger(context.logPath);	
 	new CheckPointExplorer(context, logger);
+	return new Promise(function(resolve, reject) {
+		resolve(true);
+	});
 }
 
 
