@@ -21,6 +21,18 @@
 					"scope": "application",
 					"default": 4,
 					"description": "Interval to save full file content."
+				},
+				"checkpoint.logFile": {
+					"type": "string",
+					"scope": "application",
+					"default": "checkpoint.log",
+					"description": "File name for extension log."
+				},
+				"checkpoint.errorLogFile": {
+					"type": "string",
+					"scope": "application",
+					"default": "checkpoint_error.log",
+					"description": "File name for extension error log."
 				}
 			}
 		},

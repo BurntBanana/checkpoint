@@ -9,10 +9,10 @@ import { LEVEL, MESSAGE } from 'triple-beam';
 let logger: Logger;
 
 export function initLogger(logPath:string):Logger {
-
+    let config = vscode.workspace.getConfiguration('checkpoint');
     const options =  {
         transports: [   
-            new transports.File({ filename: join(logPath, "checkpoint_log.log")}),
+            new transports.File({ filename: join(logPath, config.get('logFile') as string)}),
             new transports.Console({
                 log(info, callback) {
                   if (this.stderrLevels?[info[LEVEL]]:"") {
@@ -37,7 +37,7 @@ export function initLogger(logPath:string):Logger {
             format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
         ),
         exceptionHandlers: [
-            new transports.File({ filename: join(logPath, "checkpoint_error.log") })
+            new transports.File({ filename: join(logPath, config.get('errorLogFile') as string) })
         ]
     };
     return createLogger(options);

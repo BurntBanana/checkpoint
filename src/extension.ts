@@ -7,7 +7,7 @@ import { LEVEL, MESSAGE } from 'triple-beam';
 import {join} from 'path';
 
 export function activate(context: vscode.ExtensionContext) {
-	let logger: Logger = initLogger(context.logPath);
+	let logger: Logger = initLogger(context.logPath);	
 	new CheckPointExplorer(context, logger);
 }
 
