@@ -22,12 +22,21 @@ var deleteFolderRecursive = function(path:string) {
   };
 
 describe('Extension', () => {
-    const logPath = join(__dirname, 'logs');
-	let context : ExtensionContext = new ExtImpl([],new MemImpl(),new MemImpl(),"test","test","test", logPath);
+    let logPath:string;
+    
+    before(() => {
+        logPath = join(__dirname, 'logs');
+        let context : ExtensionContext = new ExtImpl([],new MemImpl(),new MemImpl(),"test","test","test", logPath);
+        extension.activate(context);
+    });
+
 	it('should initialise logger', () => {
-		extension.activate(context);
         const logFile = readFileSync(join(logPath, vscode.workspace.getConfiguration('checkpoint').get('logFile') as string));
         assert.notEqual(logFile.length, 0);
+    });
+
+    after(() => {
         deleteFolderRecursive(logPath);
-	});
+    });
+
 });

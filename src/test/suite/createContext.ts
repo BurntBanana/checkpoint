@@ -15,22 +15,6 @@ interface VSExtensionContext {
 	readonly logPath: string;
 }
 
-// export class dummyClass {
-// 	private key: string;
-// 	private value : string;
-
-// 	constructor(key: string, value : string)
-// 	{
-// 		this.key = key;
-// 		this.value = value;
-//     }
-    
-//     put()
-//     {
-//         return this.key;
-//     }
-// };
-
 interface VSMemento {
 
 	get<T>(key: string): T | undefined;
@@ -41,7 +25,6 @@ interface VSMemento {
 export class MemImpl implements VSMemento {
 	public update(key: string, value: any): Thenable<void>{
 		return new Promise(function(resolve, reject) {
-			console.log("Updated - ", key, " : ", value);
 			dataStore[key] = value;
 			resolve();
 		});
@@ -49,9 +32,7 @@ export class MemImpl implements VSMemento {
 
 
 	public get<T>(key: string): T | undefined{
-        console.log("called get with key", key);
         return <T> dataStore[key];
-		// return <any>{"dummy": key};
 	}
 	constructor(){}
 }
