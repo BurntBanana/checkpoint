@@ -2,19 +2,16 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import {CheckPointExplorer, initLogger} from './CheckPointExplorer';
-import {createLogger, transports, Logger, format} from 'winston'; 
-import { LEVEL, MESSAGE } from 'triple-beam';
-import {join} from 'path';
+
 
 export function activate(context: vscode.ExtensionContext) {
-	let logger: Logger = initLogger(context.logPath);	
-	new CheckPointExplorer(context, logger);
-	return new Promise(function(resolve, reject) {
-		resolve(true);
-	});
+	if (context) {
+		new CheckPointExplorer(context);
+	}
+	else {
+		console.error("Context is undefined.");
+	}
 }
-
-
 
 // this method is called when your extension is deactivated
 export function deactivate() {}

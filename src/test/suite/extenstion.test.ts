@@ -21,14 +21,14 @@ var deleteFolderRecursive = function(path:string) {
     }
   };
 
-describe('Extension', () => {
-  it('should initialise logger', () => {
-    const logPath = join(__dirname, 'logs');
-    let context : ExtensionContext = new ExtImpl([],new MemImpl(),new MemImpl(),"test","test","test", logPath);
-    extension.activate(context).then((val) =>{
-      const logFile = readFileSync(join(logPath, vscode.workspace.getConfiguration('checkpoint').get('logFile') as string));
-      assert.notEqual(logFile.length, 0);
-      deleteFolderRecursive(logPath);
-    }); 
-  });
-});
+// describe('Extension', () => {
+//   it('should initialise logger', () => {
+//     const logPath = join(__dirname, 'logs');
+//     let context : ExtensionContext = new ExtImpl([],new MemImpl(),new MemImpl(),"test","test","test", logPath);
+//     extension.activate(context).then((val) =>{
+//       const logFile = readFileSync(join(logPath, vscode.workspace.getConfiguration('checkpoint').get('logFile') as string));
+//       assert.notEqual(logFile.length, 0);
+//       deleteFolderRecursive(logPath);
+//     }); 
+//   });
+// });
