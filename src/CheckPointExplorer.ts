@@ -10,29 +10,27 @@ import { existsSync, lstatSync } from 'fs';
 let logger: Logger;
 
 export function initLogger(logPath:string):Logger {
-    const isDirExists = existsSync(resolve(logPath, '..'));
-    if (!isDirExists) {
-        throw new Error('logPath not found in context');
-    }
     const config = vscode.workspace.getConfiguration('checkpoint');
-    let options =  {
-        transports: [   
-            new transports.File({ filename: join(logPath, config.get('logFile') as string)}),
-            new transports.Console({
-                log(info, callback) {
-                  if (this.stderrLevels?[info[LEVEL]]:"") {
-                    console.error(info[MESSAGE]);
-                    if (callback) {
-                      callback();
-                    }
-                    return;
-                  }
-                  console.log(info[MESSAGE]);
-                  if (callback) {
+    const isDirExists = existsSync(resolve(logPath, '..'));
+    const consoleTransport = new transports.Console({
+        log(info, callback) {
+            if (this.stderrLevels?[info[LEVEL]]:"") {
+                console.error(info[MESSAGE]);
+                if (callback) {
                     callback();
-                  }
                 }
-              })
+                return;
+            }
+            console.log(info[MESSAGE]);
+            if (callback) {
+                callback();
+            }
+        }
+    });
+
+    const options =  {
+        transports: [   
+            consoleTransport
         ],
         format: format.combine(
             format.colorize(),
@@ -42,9 +40,20 @@ export function initLogger(logPath:string):Logger {
             format.printf(info => `[${info.timestamp}] [${info.level}] ${info.message}`)
         ),
         exceptionHandlers: [
-            new transports.File({ filename: join(logPath, config.get('errorLogFile') as string) })
+            consoleTransport
         ]
     };
+    let logger : Logger = createLogger(options);
+    if (isDirExists) {
+        logger.add(new transports.File({ filename: join(logPath, config.get('logFile') as string)}));
+        logger.exceptions.handle(
+            new transports.File({ filename: join(logPath, config.get('errorLogFile') as string) })
+        );
+        logger.info('Initialized logging for Console & File mode successfully.');
+    }
+    else{
+        logger.warn("Log file path does not exist. Logging only in console");
+    }
     return createLogger(options);
 }
 /**
