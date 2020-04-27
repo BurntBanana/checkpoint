@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import * as CheckPointExplorer from '../../CheckPointExplorer';
+import * as CheckPointExplorer from '../../checkPointExplorer';
 import * as extension from '../../extension';
 import {CheckPointObject} from '../../Interfaces/CheckPointInterfaces';
 import {patch_obj} from 'diff-match-patch';
@@ -28,6 +28,20 @@ describe('Test registered commands', () => {
                     const currentDocumentText = currentDocument.getText();
                     const checkPointObject : CheckPointObject = dataStore[currentDocument.fileName as string] as CheckPointObject;
                     assert.equal(currentDocumentText, checkPointObject.current);
+                });
+            }
+        });
+    });
+    it('Test2', async () => {
+        await vscode.window.showTextDocument(vscode.Uri.file(testFilePath))
+        .then(async (textEditor) => {
+            if(textEditor){
+                await vscode.commands.executeCommand('checkPointExplorer.commenceTracking')
+                .then(() =>{
+                    const currentDocument : vscode.TextDocument = textEditor.document as vscode.TextDocument;
+                    const currentDocumentText = currentDocument.getText();
+                    const checkPointObject : CheckPointObject = dataStore[currentDocument.fileName as string] as CheckPointObject;
+                    assert.equal("1", checkPointObject.current);
                 });
             }
         });
