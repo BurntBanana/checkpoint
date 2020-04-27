@@ -1,9 +1,10 @@
 import * as vscode from 'vscode';
-import {CheckPointObject, CheckPointTreeItem} from './Interfaces/CheckPointInterfaces';
+import {CheckPointObject, CheckPointTreeItem} from './Interfaces/checkPointInterfaces';
 import {join, resolve} from 'path';
 import {diff_match_patch, patch_obj} from 'diff-match-patch';
 import * as dateFormat from 'dateformat';
-import {logger, activate} from './extension';
+import {logger} from './extension';
+
 /**
  * Concrete class to initialise CheckPointTreeItem objects
  * @param timestamp Date of checkpoint creation

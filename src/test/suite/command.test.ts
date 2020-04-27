@@ -1,11 +1,9 @@
 import * as assert from 'assert';
 import * as vscode from 'vscode';
-import * as CheckPointExplorer from '../../checkPointExplorer';
 import * as extension from '../../extension';
-import {CheckPointObject} from '../../Interfaces/CheckPointInterfaces';
-import {patch_obj} from 'diff-match-patch';
-import {ExtensionContext, ExtImpl, Memento, MemImpl, dataStore} from './createContext';
-import {writeFileSync, writeFile} from 'fs';
+import {CheckPointObject} from '../../Interfaces/checkPointInterfaces';
+import {ExtensionContext, ExtImpl, MemImpl, dataStore} from './createContext';
+import {writeFileSync} from 'fs';
 import { join } from 'path';
 
 const testFilePath = join(__dirname, "test.txt");
