@@ -5,6 +5,12 @@ import * as vscode from 'vscode';
 import {join, resolve} from 'path';
 export {Logger} from 'winston';
 
+/**
+ * Creates a `winston.Logger` with custom transports.
+ *
+ * @param logPath The path where the logs are to be stored.
+ * @return logger The newly created `winston.Logger` object.
+ */
 export function initLogger(logPath:string):Logger {
     const config = vscode.workspace.getConfiguration('checkpoint');
     const isDirExists = existsSync(resolve(logPath, '..'));
