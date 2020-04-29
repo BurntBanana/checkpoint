@@ -35,11 +35,11 @@ export class CheckPointExplorer {
         this.createDataProvider();
 
         logger.info("Registering commands");
-        vscode.commands.registerCommand('checkPointExplorer.commenceTracking', () => this.commenceTracking());
-        vscode.commands.registerCommand('checkPointExplorer.openCheckPoint', (index) => this.treeDataProvider?.openCheckPoint(index));
-        vscode.commands.registerCommand('checkPointExplorer.deleteAllCheckPoints', () => this.deleteCheckPoints());
-        vscode.commands.registerCommand('checkPointExplorer.deleteCheckPoint', (element) => this.deleteSingleCheckPoint(element));
-        vscode.commands.registerCommand('checkPointExplorer.setActiveCheckPoint', (element) => this.treeDataProvider?.setActiveCheckPoint(element.index));
+        context.subscriptions.push(vscode.commands.registerCommand('checkPointExplorer.commenceTracking', () => this.commenceTracking()));
+        context.subscriptions.push(vscode.commands.registerCommand('checkPointExplorer.openCheckPoint', (index) => this.treeDataProvider?.openCheckPoint(index)));
+        context.subscriptions.push(vscode.commands.registerCommand('checkPointExplorer.deleteAllCheckPoints', () => this.deleteCheckPoints()));
+        context.subscriptions.push(vscode.commands.registerCommand('checkPointExplorer.deleteCheckPoint', (element) => this.deleteSingleCheckPoint(element)));
+        context.subscriptions.push(vscode.commands.registerCommand('checkPointExplorer.setActiveCheckPoint', (element) => this.treeDataProvider?.setActiveCheckPoint(element.index)));
         //Handle file save events.
         vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {	
             if(this.treeDataProvider) {

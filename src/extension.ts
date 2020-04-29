@@ -8,12 +8,21 @@ export function activate(context: vscode.ExtensionContext) {
 	if (context) {
 		initLogger(context.logPath);
 		new CheckPointExplorer(context);
+
 	}
 	else {
-		console.error("Context is undefined.");
+		logger.error("Context is undefined.");
 	}
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate(context: vscode.ExtensionContext) {
+
+	return new Promise((resolve) => {
+		context.subscriptions.forEach(element => {
+			element.dispose();
+		});
+		resolve(true);
+	});
+}
 export {logger};
