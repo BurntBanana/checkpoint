@@ -70,7 +70,7 @@
 				}
 			},
 			{
-				"command": "checkPointExplorer.openFile",
+				"command": "checkPointExplorer.openCheckPoint",
 				"title": "Reconstruct file at checkpoint"
 			},
 			{

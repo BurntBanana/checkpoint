@@ -1,9 +1,9 @@
 import * as vscode from 'vscode';
 import {CheckPointObject, CheckPointTreeItem} from './Interfaces/checkPointInterfaces';
-import {join, resolve} from 'path';
+import {join} from 'path';
 import {diff_match_patch, patch_obj} from 'diff-match-patch';
 import * as dateFormat from 'dateformat';
-import {logger} from './extension';
+import {logger, initLogger} from './logger';
 
 /**
  * Concrete class to initialise CheckPointTreeItem objects
@@ -44,11 +44,11 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
     /** Interval to store file in patches array */
     private interval: number;   
 
-    /** Set if checkpoint is currently in selection */
-    private checkPointSelected : boolean;
+    /** Last saved value of the current file */
+    private lastSavedFile : string;
 
-    /** Set if active checkpoint has been set */
-    private saveForActive : boolean;
+    /** Set if save chekpoint has to be skipped */
+    private skipSave : boolean;
 
     /**
      * Returns the closest file checkpoint
@@ -64,6 +64,11 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      * @param currentFileCheckPointObject CheckPointObject for the current active file
      * */
     constructor(context: vscode.ExtensionContext, currentFileCheckPointObject: CheckPointObject) {
+
+        if(!logger) {
+            initLogger(context.logPath);
+        }
+
         //update TreeView event
         this._onDidChangeTreeData = new vscode.EventEmitter<CheckPointTreeItem>();
         this.onDidChangeTreeData = this._onDidChangeTreeData.event;
@@ -71,10 +76,10 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         this.checkPointObject = currentFileCheckPointObject;
         this.interval = vscode.workspace.getConfiguration("checkpoint").get("interval") || 4;
         logger.info("Checkpoint interval has been set to: " + this.interval);
-        this.checkPointSelected = false;
         logger.info("Initialising diff patch match object");
+        this.lastSavedFile = currentFileCheckPointObject?.current || "";
         this.dmp = new diff_match_patch();
-        this.saveForActive = false;
+        this.skipSave = false;
     }
 
     /**
@@ -92,8 +97,8 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
                         editBuilder.replace(dataRange, checkPointData);
                     })
                     .then(() => {
+                        this.lastSavedFile = document.getText(); 
                         logger.info("Active document text changed");
-                        this.checkPointSelected = true; //set checkpoint as selected
                         resolve(true);
                     }, () => {
                         logger.warn("Text editor update failed for: " + document.fileName);
@@ -118,31 +123,30 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      */
     public openCheckPoint(index: number) {
         logger.info("Checkpoint " + index + " selected");
+        const document = vscode.window.activeTextEditor?.document;
+        if (document) {
+            if (this.lastSavedFile !== document?.getText()) {
+                this.saveCheckPoint(document as vscode.TextDocument);
+            }  
+        }
+        else {
+            logger.warn("Document is undefined");
+        }
+
         return new Promise(async (resolve,reject) => {
-            const document = vscode.window.activeTextEditor?.document;
-            //if file is unsaved, make checkpoint and proceeed
-            if (document) {
-                this.saveCheckPoint(document as vscode.TextDocument, this.checkPointSelected); 
-                const file = await this.generateFileByPatch(index);
-                if (file) {
-                    this.editorUpdate(file).then(() => {
-                        resolve(true);
-                    }, () => {
-                        logger.warn("Editor update failed for index: " + index);
-                        reject(false);
-                    });
-                }
-                else {
+            const file = await this.generateFileByPatch(index);
+            if (file) {
+                this.editorUpdate(file).then(() => {
+                    resolve(true);
+                }, () => {
+                    logger.warn("Editor update failed for index: " + index);
                     reject(false);
-                }
-                
+                });
             }
             else {
-                logger.warn("Document is undefined");
                 reject(false);
             }
-        });
-        
+        });  
     }
 
     /**
@@ -150,7 +154,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      * @param document [vscode.TextDocument](#vscode.TextDocument) document which is saved
      * @param calledByOpen [boolean](#boolean) Set to true if checkpoint is opened
      */
-    public saveCheckPoint(document: vscode.TextDocument, calledByOpen: boolean = false) {
+    public saveCheckPoint(document: vscode.TextDocument) {
 
         const currentFile : string = document.getText();
         let previousFile = this.checkPointObject.current;
@@ -160,14 +164,15 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
             return;
         }
         //check for save as or active file or if both files are same or checkpoint is opened
-        else if (this.saveForActive || (vscode.window.activeTextEditor?.document.fileName !== document.fileName) || calledByOpen || (currentFile === previousFile)) {
+        else if (this.skipSave || (vscode.window.activeTextEditor?.document.fileName !== document.fileName) || (currentFile === previousFile)) {
             logger.info(document.fileName + " not saved because it is either:\n 1.Active,\t2.Saved As,\t3.Called by open\t4.Same file");
             return;
         }
-        else {
-            logger.info("Saving new checkpoint for: " + document.fileName);
-            this.checkPointSelected = false;
-        }
+
+        logger.info("Saving new checkpoint for: " + document.fileName);
+
+        this.lastSavedFile = currentFile;
+
        
         //check whether to store patch or file
         if (this.checkPointObject.patches.length % this.interval === 0) {
@@ -221,7 +226,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         treeItem.contextValue = "checkPointItem";
         treeItem.iconPath = {light: resourcePath, dark: resourcePath};
         treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
-        treeItem.command = { command: 'checkPointExplorer.openFile', title: "Open File", arguments: [element.index], };
+        treeItem.command = { command: 'checkPointExplorer.openCheckPoint', title: "Open CheckPoint", arguments: [element.index], };
 		return treeItem;
     }
 
@@ -258,10 +263,22 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
             }
             else {
                 logger.warn("Active editor is undefined");
+                this.checkPointObject = checkPointObject;
+                this._onDidChangeTreeData.fire();
                 reject(false);
             }
         });
         
+    }
+    /**
+     * Method to update the last saved file.
+     *
+     * @param string - New value for current document text.
+     * @returns void
+     *
+     */
+    updateLastSavedFile(documentText: string) {
+        this.lastSavedFile = documentText;
     }
 
     /**
@@ -355,14 +372,13 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         this.checkPointObject.active = index;
 
         this.openCheckPoint(index).then(() => {
-            this.saveForActive = true;
+            this.skipSave = true;
             const document = vscode.window.activeTextEditor?.document;
             if (document) {
                 logger.info("Active checkpoint set to: " + index);
                 vscode.window.activeTextEditor?.document.save().then((didSave: boolean) => {
                     this._onDidChangeTreeData.fire();
-                    this.saveForActive = false;
-                    this.checkPointSelected = false;
+                    this.skipSave = false;
                 });
             }   
             else {

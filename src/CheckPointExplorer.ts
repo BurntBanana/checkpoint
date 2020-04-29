@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import {CheckPointObject, CheckPointTreeItem} from './Interfaces/checkPointInterfaces';
-import {logger} from './extension';
+import {logger, initLogger} from './logger';
 import {CheckPointProvider, CheckPointObjectImpl} from './checkPointProvider';
 /**
  * Class to generate and set the `TreeDataProvider` & `TreeView` for displaying CheckPoints.
@@ -26,12 +26,17 @@ export class CheckPointExplorer {
      *
      */
     constructor(context: vscode.ExtensionContext){
-        this.checkPointExplorerContext = context;        
-        // logger = initLogger(context.logPath);
+        this.checkPointExplorerContext = context; 
+        
+        if(!logger) {
+            initLogger(context.logPath);
+        }
+
         this.createDataProvider();
+
         logger.info("Registering commands");
         vscode.commands.registerCommand('checkPointExplorer.commenceTracking', () => this.commenceTracking());
-        vscode.commands.registerCommand('checkPointExplorer.openFile', (index) => this.treeDataProvider?.openCheckPoint(index));
+        vscode.commands.registerCommand('checkPointExplorer.openCheckPoint', (index) => this.treeDataProvider?.openCheckPoint(index));
         vscode.commands.registerCommand('checkPointExplorer.deleteAllCheckPoints', () => this.deleteCheckPoints());
         vscode.commands.registerCommand('checkPointExplorer.deleteCheckPoint', (element) => this.deleteSingleCheckPoint(element));
         vscode.commands.registerCommand('checkPointExplorer.setActiveCheckPoint', (element) => this.treeDataProvider?.setActiveCheckPoint(element.index));
@@ -50,10 +55,12 @@ export class CheckPointExplorer {
             logger.info("Active editor switched to: " + documentEditor?.document.fileName);
             if (documentEditor) {
                 let currentFileCheckPointObject = this.checkPointExplorerContext.globalState.get(documentEditor.document.fileName || "") || {} as CheckPointObject;
+                this.treeDataProvider?.updateLastSavedFile(documentEditor.document.getText());
                 this.treeDataProvider?.updateCheckPointObject(currentFileCheckPointObject as CheckPointObject);
             }
             else {
                 logger.warn("Active editor is undefined");
+                this.treeDataProvider?.updateCheckPointObject({} as CheckPointObject);
             }
         });
         
@@ -120,7 +127,7 @@ export class CheckPointExplorer {
         let currentFileCheckPointObject = this.checkPointExplorerContext.globalState.get(current_document?.fileName || "") || undefined;
         
         if(!currentFileCheckPointObject){
-            logger.info("No checkpoints found for: " + current_document);
+            logger.info("No checkpoints found for: " + current_document?.fileName);
             currentFileCheckPointObject = {} as CheckPointObject;
         }
         else {
