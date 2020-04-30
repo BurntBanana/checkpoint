@@ -1,10 +1,11 @@
 import * as assert from 'assert';
 import * as extension from '../../extension';
-import {ExtensionContext, ExtImpl, MemImpl, dataStore} from './createContext';
-
+import {ExtensionContext, ExtImpl, MemImpl} from './createContext';
 import {logger, silenceLogs} from '../../logger';
+import {commands} from 'vscode';
 
-const context : ExtensionContext = new ExtImpl([],new MemImpl(),new MemImpl(),"test","test","test","logtest");
+// const logPath = join(__dirname, "extension")
+const context : ExtensionContext = new ExtImpl([],new MemImpl(),new MemImpl(),"test","test","test",__dirname);
 
 describe('Extension', () => {
 
@@ -22,7 +23,14 @@ describe('Extension', () => {
         assert.equal(context.subscriptions.length, 5);
     });
 
-    after(() => {
+    
+    it('Should dispose off registered commands',  () => {
+        extension.deactivate(context);
+        context.subscriptions.push(commands.registerCommand('checkPointExplorer.commenceTracking', () => {}));
+        assert.equal(context.subscriptions.length, 6);
+    });
+
+    after( () => {
         extension.deactivate(context);
     });
 });

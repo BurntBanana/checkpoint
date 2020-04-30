@@ -17,12 +17,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate(context: vscode.ExtensionContext) {
-
-	return new Promise((resolve) => {
-		context.subscriptions.forEach(element => {
-			element.dispose();
-		});
-		resolve(true);
+	context.subscriptions.forEach(element => {
+		element.dispose();
 	});
 }
 export {logger};
