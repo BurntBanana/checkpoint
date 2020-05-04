@@ -1,17 +1,17 @@
 import * as vscode from 'vscode';
-import {CheckPointObject, CheckPointTreeItem} from './Interfaces/checkPointInterfaces';
-import {join} from 'path';
-import {diff_match_patch, patch_obj} from 'diff-match-patch';
+import { CheckPointObject, CheckPointTreeItem } from './Interfaces/checkPointInterfaces';
+import { join } from 'path';
+import { diff_match_patch, patch_obj } from 'diff-match-patch';
 import * as dateFormat from 'dateformat';
-import {logger, initLogger} from './logger';
+import { logger, initLogger } from './logger';
 
 /**
  * Concrete class to initialise CheckPointTreeItem objects
  * @param timestamp Date of checkpoint creation
  * @param index Index of Tree item
  * */
-class CheckPointTreeItemImpl implements CheckPointTreeItem {
-    constructor (public timestamp: Date, public index: number) {}
+export class CheckPointTreeItemImpl implements CheckPointTreeItem {
+    constructor(public timestamp: Date, public index: number) { }
 }
 /**
  * Concrete class to initialise CheckPointObject objects
@@ -20,7 +20,7 @@ class CheckPointTreeItemImpl implements CheckPointTreeItem {
  * @param current Current text content of file
  * */
 export class CheckPointObjectImpl implements CheckPointObject {
-    constructor (public patches: Array<patch_obj[]|string>, public timestamps: Array<Date>, public current: string, public active:number) {}
+    constructor(public patches: Array<patch_obj[] | string>, public timestamps: Array<Date>, public current: string, public active: number) { }
 }
 
 /**
@@ -28,7 +28,7 @@ export class CheckPointObjectImpl implements CheckPointObject {
 */
 export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTreeItem> {
     /**diff-patch-match object */
-    private dmp: diff_match_patch; 
+    private dmp: diff_match_patch;
 
     /*** Event to signal that an element or root has changed.*/
     private _onDidChangeTreeData: vscode.EventEmitter<CheckPointTreeItem>;
@@ -39,24 +39,24 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
     private checkPointContext: vscode.ExtensionContext;
 
     /** Current active CheckPoint object */
-    private checkPointObject: CheckPointObject; 
+    private checkPointObject: CheckPointObject;
 
     /** Interval to store file in patches array */
-    private interval: number;   
+    private interval: number;
 
     /** Last saved value of the current file */
-    private lastSavedFile : string;
+    private lastSavedFile: string;
 
     /** Set if save chekpoint has to be skipped */
-    private skipSave : boolean;
+    private skipSave: boolean;
 
     /**
      * Returns the closest file checkpoint
      * @param index Index whose closest checkpoint is to be computed
      * @returns [number](#number) Closest checkpoint 
      */
-    private closestCheckPoint = (index : number) => {
-        return (Math.floor(index/this.interval) * this.interval);
+    private closestCheckPoint = (index: number) => {
+        return (Math.floor(index / this.interval) * this.interval);
     };
 
     /**
@@ -65,7 +65,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      * */
     constructor(context: vscode.ExtensionContext, currentFileCheckPointObject: CheckPointObject) {
 
-        if(!logger) {
+        if (!logger) {
             initLogger(context.logPath);
         }
 
@@ -86,24 +86,24 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      * Update the current text editor to show file at selected checkpoints
      * @param checkPointData [string](#string) File content at checkpoint
      */
-    private editorUpdate(checkPointData : string) {
+    private editorUpdate(checkPointData: string) {
         return new Promise((resolve, reject) => {
             const { activeTextEditor } = vscode.window;
             if (activeTextEditor) {
                 const { document } = activeTextEditor;
                 if (document) {
-                    let dataRange : vscode.Range = document.validateRange(new vscode.Range(0, 0, document.lineCount as number, 0));
+                    let dataRange: vscode.Range = document.validateRange(new vscode.Range(0, 0, document.lineCount as number, 0));
                     activeTextEditor.edit(editBuilder => {
                         editBuilder.replace(dataRange, checkPointData);
                     })
-                    .then(() => {
-                        this.lastSavedFile = document.getText(); 
-                        logger.info("Active document text changed");
-                        resolve(true);
-                    }, () => {
-                        logger.warn("Text editor update failed for: " + document.fileName);
-                        reject(false);
-                    }); 
+                        .then(() => {
+                            this.lastSavedFile = document.getText();
+                            logger.info("Active document text changed");
+                            resolve(true);
+                        }, () => {
+                            logger.warn("Text editor update failed for: " + document.fileName);
+                            reject(false);
+                        });
                 }
                 else {
                     logger.warn("Document is undefined");
@@ -127,13 +127,13 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         if (document) {
             if (this.lastSavedFile !== document?.getText()) {
                 this.saveCheckPoint(document as vscode.TextDocument);
-            }  
+            }
         }
         else {
             logger.warn("Document is undefined");
         }
 
-        return new Promise(async (resolve,reject) => {
+        return new Promise(async (resolve, reject) => {
             const file = await this.generateFileByPatch(index);
             if (file) {
                 this.editorUpdate(file).then(() => {
@@ -146,7 +146,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
             else {
                 reject(false);
             }
-        });  
+        });
     }
 
     /**
@@ -156,7 +156,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      */
     public saveCheckPoint(document: vscode.TextDocument) {
 
-        const currentFile : string = document.getText();
+        const currentFile: string = document.getText();
         let previousFile = this.checkPointObject.current;
 
         if (!document) {
@@ -173,7 +173,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
 
         this.lastSavedFile = currentFile;
 
-       
+
         //check whether to store patch or file
         if (this.checkPointObject.patches.length % this.interval === 0) {
             logger.info("Saving file");
@@ -182,13 +182,13 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         else {
             logger.info("Saving patch");
             let previousFile = this.checkPointObject.current;
-            let patch:patch_obj[] = this.dmp.patch_make(previousFile, currentFile);
+            let patch: patch_obj[] = this.dmp.patch_make(previousFile, currentFile);
             this.checkPointObject.patches.push(patch);
         }
 
         this.checkPointObject.current = currentFile;
         this.checkPointObject.timestamps.push(new Date(Date.now()));
-        
+
         //set new checkpoint as active
         this.checkPointObject.active = this.checkPointObject.patches.length - 1;
         logger.info("Checkpoint " + this.checkPointObject.active + " created for: " + document.fileName);
@@ -209,25 +209,25 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         else {
             logger.info("Creating tree items");
             for (let i = 0; i < this.checkPointObject.patches.length; i++) {
-                const treeItem:CheckPointTreeItem = new CheckPointTreeItemImpl(this.checkPointObject.timestamps[i], i);
+                const treeItem: CheckPointTreeItem = new CheckPointTreeItemImpl(this.checkPointObject.timestamps[i], i);
                 result.push(treeItem);
             }
         }
         return result;
     }
-     /**
-     *Method to display tree element from `CheckPointTreeItem` object.
-     * @param element CheckPointTreeItem object.
-     * @return TreeItem generated from CheckPointTreeItem
-     */
+    /**
+    *Method to display tree element from `CheckPointTreeItem` object.
+    * @param element CheckPointTreeItem object.
+    * @return TreeItem generated from CheckPointTreeItem
+    */
     getTreeItem(element: CheckPointTreeItem): vscode.TreeItem {
         const treeItem = new vscode.TreeItem(dateFormat(element.timestamp));
         let resourcePath: string = join(__filename, '..', '..', 'resources', element.index === this.checkPointObject.active ? '/garbage.svg' : '/checkPointIcon.svg');
         treeItem.contextValue = "checkPointItem";
-        treeItem.iconPath = {light: resourcePath, dark: resourcePath};
+        treeItem.iconPath = { light: resourcePath, dark: resourcePath };
         treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
         treeItem.command = { command: 'checkPointExplorer.openCheckPoint', title: "Open CheckPoint", arguments: [element.index], };
-		return treeItem;
+        return treeItem;
     }
 
     /**
@@ -237,7 +237,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      * @returns Promise<boolean>
      *
      */
-    updateCheckPointObject(checkPointObject: CheckPointObject) : Promise<boolean>{
+    updateCheckPointObject(checkPointObject: CheckPointObject): Promise<boolean> {
 
         return new Promise((resolve, reject) => {
 
@@ -268,7 +268,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
                 reject(false);
             }
         });
-        
+
     }
     /**
      * Method to update the last saved file.
@@ -288,8 +288,8 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      * @returns void
      *
      */
-    async deleteSingleCheckPoint(index : number) : Promise<void>{
-        let generatedFile : string = "";
+    async deleteSingleCheckPoint(index: number): Promise<void> {
+        let generatedFile: string = "";
         logger.info("Deleing checkpoint: " + index);
         //If there is only a single CheckPoint in the view.
         if (this.checkPointObject.patches.length === 1 && index === 0) {
@@ -297,10 +297,10 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
             return;
         }
         //If the last element is being deleted.
-        if(index === this.checkPointObject.patches.length - 1){
-            this.checkPointObject.current = await this.generateFileByPatch(index -1);
+        if (index === this.checkPointObject.patches.length - 1) {
+            this.checkPointObject.current = await this.generateFileByPatch(index - 1);
         }
-        else if(index === this.closestCheckPoint(index)){
+        else if (index === this.closestCheckPoint(index)) {
             generatedFile = this.checkPointObject.patches[index] as string;
         }
         else {
@@ -311,12 +311,12 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         this.checkPointObject.patches.splice(index, 1);
         this.checkPointObject.timestamps.splice(index, 1);
 
-        for(let k = index; k < this.checkPointObject.patches.length; k++){
-            if(k === this.closestCheckPoint(k)){
+        for (let k = index; k < this.checkPointObject.patches.length; k++) {
+            if (k === this.closestCheckPoint(k)) {
                 //Generate a file by applying patches as current index is now an interval CheckPoint file.
                 this.checkPointObject.patches[k] = this.dmp.patch_apply(this.checkPointObject.patches[k] as patch_obj[], generatedFile)[0];
             }
-            else if(k === this.closestCheckPoint(k+1) -1){
+            else if (k === this.closestCheckPoint(k + 1) - 1) {
                 //Generate a patch as current index is now no longer an interval CheckPoint file.
                 this.checkPointObject.patches[k] = this.dmp.patch_make(generatedFile, this.checkPointObject.patches[k] as string);
             }
@@ -328,11 +328,11 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         //Active node is deleted
         if (index === this.checkPointObject.active) {
             this.setActiveCheckPoint(this.checkPointObject.active - 1);
-             
-         }
-         else if (index < this.checkPointObject.active){
-             this.checkPointObject.active -= 1;
-         }
+
+        }
+        else if (index < this.checkPointObject.active) {
+            this.checkPointObject.active -= 1;
+        }
     }
 
     /**
@@ -342,15 +342,15 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      * @returns Promise<string | false> - Returns the generated file at index. 
      *
      */
-    private generateFileByPatch(index : number) : Promise<string> {
+    private generateFileByPatch(index: number): Promise<string> {
         return new Promise((resolve, reject) => {
 
             if (this.checkPointObject.patches.length >= index) {
                 logger.info("Generating file for checkpoint: " + index);
 
-                let generatedFile : string = this.checkPointObject.patches[this.closestCheckPoint(index)] as string;
+                let generatedFile: string = this.checkPointObject.patches[this.closestCheckPoint(index)] as string;
 
-                for(let i = this.closestCheckPoint(index) + 1; i<= index; i++){
+                for (let i = this.closestCheckPoint(index) + 1; i <= index; i++) {
                     generatedFile = this.dmp.patch_apply(this.checkPointObject.patches[i] as patch_obj[], generatedFile)[0];
                 }
                 resolve(generatedFile);
@@ -358,7 +358,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
             else {
                 logger.warn("File generation failed at index: " + index);
                 reject(false);
-            }  
+            }
         });
 
     }
@@ -369,21 +369,24 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      */
     setActiveCheckPoint(index: number) {
 
-        this.checkPointObject.active = index;
-
-        this.openCheckPoint(index).then(() => {
+        return new Promise(async (resolve, reject) => {
+            this.checkPointObject.active = index;
+            await this.openCheckPoint(index);
             this.skipSave = true;
             const document = vscode.window.activeTextEditor?.document;
             if (document) {
                 logger.info("Active checkpoint set to: " + index);
-                vscode.window.activeTextEditor?.document.save().then((didSave: boolean) => {
-                    this._onDidChangeTreeData.fire();
-                    this.skipSave = false;
-                });
-            }   
+                await vscode.window.activeTextEditor?.document.save();
+                this._onDidChangeTreeData.fire();
+                this.skipSave = false;
+                resolve(true);
+            }
             else {
                 logger.warn("Document is undefined");
-            }  
-        }); 
+                reject(false);
+            }
+        });
+
+
     }
 }
