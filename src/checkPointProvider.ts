@@ -134,7 +134,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         }
 
         return new Promise(async (resolve, reject) => {
-            const file = await this.generateFileByPatch(index);
+            const file = await this.generateFileByPatch(index).catch(error => reject(error));
             if (file) {
                 this.editorUpdate(file).then(() => {
                     resolve(true);
@@ -142,9 +142,6 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
                     logger.warn("Editor update failed for index: " + index);
                     reject(false);
                 });
-            }
-            else {
-                reject(false);
             }
         });
     }

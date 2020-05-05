@@ -204,7 +204,48 @@ describe('CheckPointExplorer', () => {
 
     });
 
+    describe("Save checkpoint event", () => {
+        const testFilePath = join(__dirname, "save_checkpoint_test.txt");
+        let checkPointObject: CheckPointObject;
 
+        before(async () => {
+            writeFileSync(testFilePath, "0");
+            testFiles.push(testFilePath);
+            await vscode.window.showTextDocument(vscode.Uri.file(testFilePath));
+            await vscode.commands.executeCommand('checkPointExplorer.commenceTracking');
+
+        });
+
+        it('Should not create checkpoint for clean file', async () => {
+
+            const {activeTextEditor} = vscode.window;
+            await activeTextEditor?.document.save();
+            checkPointObject = dataStore[activeTextEditor?.document.fileName as string] as CheckPointObject;
+
+            assert.equal(checkPointObject.patches.length, 1); //new checkpoint
+            assert.equal(checkPointObject.current, activeTextEditor?.document.getText());
+            assert.equal(checkPointObject.active, 0);
+
+        });
+
+        it('Should create checkpoint for dirty file', async () => {
+            const {activeTextEditor} = vscode.window;
+            await activeTextEditor?.edit(editBuilder => {
+                editBuilder.insert(new vscode.Position(0, 1), "1");
+            });
+            await activeTextEditor?.document.save();
+            checkPointObject = dataStore[activeTextEditor?.document.fileName as string] as CheckPointObject;
+
+            assert.equal(checkPointObject.patches.length, 2); //new checkpoint
+            assert.equal(checkPointObject.current, activeTextEditor?.document.getText());
+            assert.equal(checkPointObject.active, 1);
+
+        });
+
+        after(async () => {
+            await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+        });
+    });
 
     after(() => {
         deactivate(context);
