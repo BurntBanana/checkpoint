@@ -1,6 +1,6 @@
 # checkpoint README
 
-This is the README for your extension "checkpoint". After writing up a brief description, we recommend including the following sections.
+See features below. 
 
 ## Features
 
@@ -20,7 +20,7 @@ If you have any requirements or dependencies, add a section describing those and
 
 Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
 
-For example:
+Example:
 
 This extension contributes the following settings:
 

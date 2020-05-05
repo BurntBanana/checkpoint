@@ -16,7 +16,7 @@ const config = {
     node: false,
     optimization: {
         minimize: true,
-        minimizer: [new TerserPlugin()],
+        minimizer: [new TerserPlugin({ extractComments: false })],
     },
 
     entry: './src/extension.ts', // the entry point of this extension, 📖 -> https://webpack.js.org/configuration/entry-context/
@@ -49,13 +49,14 @@ const config = {
                     }
                 }]
             },
-            {
-                test: /\.(png|svg|jpg|gif)$/,
-                use: [
-                    'file-loader',
-                ],
-            },
-    ]
+            // {
+            //     test: /\.(png|svg|jpg|gif)$/,
+            //     loader: 'file-loader',
+            //     options: {
+            //         name: '[path][name].[ext]',
+            //     }
+            // },
+        ]
     },
 };
 

@@ -4,8 +4,6 @@ import { join,} from 'path';
 import { diff_match_patch, patch_obj } from 'diff-match-patch';
 import * as dateFormat from 'dateformat';
 import { logger, initLogger } from './logger';
-import { default as garbageLogo} from '../resources/garbage.svg';
-import { default as normalLogo} from '../resources/checkPointIcon.svg';
 
 /**
  * Concrete class to initialise CheckPointTreeItem objects
@@ -224,9 +222,8 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
     */
     getTreeItem(element: CheckPointTreeItem): vscode.TreeItem {
         const treeItem = new vscode.TreeItem(dateFormat(element.timestamp));
-        // let resourcePath: string = join(__filename, '..', '..', 'resources', element.index === this.checkPointObject.active ? '/garbage.svg' : '/checkPointIcon.svg');
-        let resourcePath = element.index === this.checkPointObject.active ? join(__dirname,garbageLogo) : join(__dirname,normalLogo);
-        console.log(__dirname);
+        // let resourcePath: string = join(__dirname, element.index === this.checkPointObject.active ? garbage : normalLogo);
+        let resourcePath: string = join(__filename, '..', '..', 'resources', element.index === this.checkPointObject.active ? '/garbage.svg' : '/checkPointIcon.svg');
         treeItem.contextValue = "checkPointItem";
         treeItem.iconPath = { light: resourcePath, dark: resourcePath };
         treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;

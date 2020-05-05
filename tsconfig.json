@@ -18,15 +18,14 @@
 	"include": [
 		"src/**/*.ts",
 		"./node_modules/vscode/vscode.d.ts",
-		"./node_modules/vscode/lib/*",
-		"custom.d.ts"
+		"./node_modules/vscode/lib/*"
 	],
 	"exclude": [
 		"node_modules",
 		".vscode-test",
 		".vscode/**/*",
-	],
-	"files": [ 
-		"custom.d.ts" 
+		"resources",
+		"dist",
+		"out"
 	]
 }
