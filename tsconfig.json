@@ -9,7 +9,7 @@
 		"sourceMap": true,
 		"rootDir": "src",
 		"strict": true,   /* enable all strict type-checking options */
-		"removeComments": true,
+		"removeComments": true, 
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
@@ -19,10 +19,14 @@
 		"src/**/*.ts",
 		"./node_modules/vscode/vscode.d.ts",
 		"./node_modules/vscode/lib/*",
+		"custom.d.ts"
 	],
 	"exclude": [
 		"node_modules",
 		".vscode-test",
 		".vscode/**/*",
+	],
+	"files": [ 
+		"custom.d.ts" 
 	]
 }
