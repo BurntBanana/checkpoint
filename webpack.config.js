@@ -49,13 +49,6 @@ const config = {
                     }
                 }]
             },
-            // {
-            //     test: /\.(png|svg|jpg|gif)$/,
-            //     loader: 'file-loader',
-            //     options: {
-            //         name: '[path][name].[ext]',
-            //     }
-            // },
         ]
     },
 };
