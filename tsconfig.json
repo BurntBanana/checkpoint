@@ -26,6 +26,7 @@
 		".vscode/**/*",
 		"resources",
 		"dist",
-		"out"
+		"out",
+		"test-resources"
 	]
 }
