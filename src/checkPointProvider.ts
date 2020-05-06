@@ -159,7 +159,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         }
         //check for save as or active file or if both files are same or checkpoint is opened
         else if (this.skipSave || (vscode.window.activeTextEditor?.document.fileName !== document.fileName) || (currentFile === previousFile)) {
-            logger.info(document.fileName + " not saved because it is either:\n 1.Active,\t2.Saved As,\t3.Called by open\t4.Same file");
+            logger.info(document.fileName + " not saved because it is either:\n 1.Active,\t2.Saved As,\t4.Same file");
             return;
         }
 
@@ -196,6 +196,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      */
     async getChildren(element?: CheckPointTreeItem): Promise<CheckPointTreeItem[]> {
         let result: Array<CheckPointTreeItem> = [];
+        
         if (Object.keys(this.checkPointObject).length === 0) {
             logger.info("No tree data");
             return result;
@@ -238,7 +239,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
             //If passed object is empty, update null value in globalState.
             const document = vscode.window.activeTextEditor?.document;
             const fileName = document?.fileName;
-
+            
             if (fileName) {
 
                 if (Object.keys(checkPointObject).length === 0) {
@@ -289,20 +290,20 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
             logger.info("Deleing checkpoint: " + index);
             //If there is only a single CheckPoint in the view.
             if (this.checkPointObject.patches.length === 1 && index === 0) {
-                this.updateCheckPointObject({} as CheckPointObject);
-                resolve(true);
+                await this.updateCheckPointObject({} as CheckPointObject).catch(error => reject(false));
+                return Promise.resolve(true);
             }
             //If the last element is being deleted.
             if (index === this.checkPointObject.patches.length - 1) {
-                this.checkPointObject.current = await this.generateFileByPatch(index - 1).catch(error => { reject(false); return ""; });
+                this.checkPointObject.current = await this.generateFileByPatch(index - 1).catch(error => Promise.reject(false));
             }
             else if (index === this.closestCheckPoint(index)) {
                 generatedFile = this.checkPointObject.patches[index] as string;
             }
             else {
-                generatedFile = await this.generateFileByPatch(index - 1).catch(error => { reject(false); return ""; });
+                generatedFile = await this.generateFileByPatch(index - 1).catch(error => Promise.reject(false));
                 //Bridge previous and next files by generating a patch.
-                this.checkPointObject.patches[index + 1] = this.dmp.patch_make(generatedFile, await this.generateFileByPatch(index + 1).catch(error => { reject(false); return ""; }));
+                this.checkPointObject.patches[index + 1] = this.dmp.patch_make(generatedFile, await this.generateFileByPatch(index + 1).catch(error => Promise.reject(false)));
             }
             this.checkPointObject.patches.splice(index, 1);
             this.checkPointObject.timestamps.splice(index, 1);
@@ -316,7 +317,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
                     //Generate a patch as current index is now no longer an interval CheckPoint file.
                     this.checkPointObject.patches[k] = this.dmp.patch_make(generatedFile, this.checkPointObject.patches[k] as string);
                 }
-                generatedFile = await this.generateFileByPatch(k).catch(error => { reject(false); return ""; });
+                generatedFile = await this.generateFileByPatch(k).catch(error => Promise.reject(false));
             }
 
             this.updateCheckPointObject(this.checkPointObject).catch(error => reject(error));
