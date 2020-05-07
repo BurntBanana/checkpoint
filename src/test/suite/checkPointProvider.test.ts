@@ -84,7 +84,7 @@ describe('CheckPointProvider', () => {
 
         it('Should not create checkpoints if document is undefined', () => {
             const patchesLengthOld = (<CheckPointObject>dataStore[testFilePath]).patches.length;
-            checkPointProvider.saveCheckPoint(undefined as unknown as vscode.TextDocument);
+            checkPointProvider.saveCheckPoint(<vscode.TextDocument><unknown>undefined);
             const patchesLengthNew = (<CheckPointObject>dataStore[testFilePath]).patches.length;
 
             assert.equal(patchesLengthNew, patchesLengthOld);

@@ -68,11 +68,11 @@ export class CheckPointExplorer {
             if (documentEditor) {
                 this.currentFileCheckPointObject = this.checkPointExplorerContext.globalState.get(documentEditor.document.fileName || "") || {} as CheckPointObject;
                 this.treeDataProvider?.updateLastSavedFile(documentEditor.document.getText());
-                this.treeDataProvider?.updateCheckPointObject(this.currentFileCheckPointObject);
+                this.treeDataProvider?.updateCheckPointObject(this.currentFileCheckPointObject).catch(error => logger.warn("Document is undefined "));
             }
             else {
                 logger.warn("Active editor is undefined");
-                this.treeDataProvider?.updateCheckPointObject({} as CheckPointObject);
+                this.treeDataProvider?.updateCheckPointObject({} as CheckPointObject).catch(error => logger.warn("Document is undefined "));;
             }
         });
 
@@ -87,7 +87,7 @@ export class CheckPointExplorer {
      */
     private deleteCheckPoints(): void {
         logger.info("Deleting all checkpoints");
-        this.treeDataProvider?.updateCheckPointObject({} as CheckPointObject);
+        this.treeDataProvider?.updateCheckPointObject({} as CheckPointObject).catch(error => logger.warn("Document is undefined "));;
         this.currentFileCheckPointObject = {} as CheckPointObject;
     }
 
@@ -104,7 +104,7 @@ export class CheckPointExplorer {
             logger.info("Starting file tracking for: " + currentDocument.fileName);
             const currentDocumentText = currentDocument.getText();            
             this.currentFileCheckPointObject = new CheckPointObjectImpl([currentDocumentText as string], [new Date(Date.now())], currentDocumentText as string, 0);
-            this.treeDataProvider?.updateCheckPointObject(this.currentFileCheckPointObject as CheckPointObject);
+            this.treeDataProvider?.updateCheckPointObject(this.currentFileCheckPointObject as CheckPointObject).catch(error => logger.warn("Document is undefined "));;
         }
         else {
             logger.warn("Document is undefined");
