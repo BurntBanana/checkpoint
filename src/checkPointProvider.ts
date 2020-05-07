@@ -219,7 +219,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
         const treeItem = new vscode.TreeItem(dateFormat(element.timestamp));
         let resourcePath: string = join(__dirname, '..', 'resources', element.index === this.checkPointObject.active ? '/garbage.svg' : '/checkPointIcon.svg');
         treeItem.contextValue = "checkPointItem";
-        treeItem.iconPath = { light: resourcePath, dark: resourcePath };
+        treeItem.iconPath = resourcePath;
         treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
         treeItem.command = { command: 'checkPointExplorer.openCheckPoint', title: "Open CheckPoint", arguments: [element.index], };
         return treeItem;
@@ -378,7 +378,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
                 this.checkPointObject.active = index;
                 logger.info("Active checkpoint set to: " + index);
                 await vscode.window.activeTextEditor?.document.save();
-                await this.updateCheckPointObject(this.checkPointObject).catch(error => reject(false))
+                await this.updateCheckPointObject(this.checkPointObject).catch(error => reject(false));
                 this.skipSave = false;
                 resolve(true);
             }

@@ -15,7 +15,7 @@ let checkPointProvider: CheckPointProvider;
 
 function createCheckPoints(testFilePath: string, checkpointLength: number = 1) {
     return new Promise(async (resolve) => {
-        
+
         writeFileSync(testFilePath, "0");
         await vscode.window.showTextDocument(vscode.Uri.file(testFilePath));
         await checkPointProvider.updateCheckPointObject(new CheckPointObjectImpl(["0"], [new Date(Date.now())], "0", 0));
@@ -23,7 +23,7 @@ function createCheckPoints(testFilePath: string, checkpointLength: number = 1) {
 
         for (let i = 2; i <= checkpointLength; i++) {
             await activeTextEditor?.edit(editBuilder => {
-                editBuilder.insert(new vscode.Position(0, i-1), (i-1).toString());
+                editBuilder.insert(new vscode.Position(0, i - 1), (i - 1).toString());
             });
             await activeTextEditor?.document.save();
         }
@@ -38,7 +38,7 @@ describe('CheckPointProvider', () => {
 
     const testFiles: Array<string> = [];
 
-    before(() => { 
+    before(() => {
         const currentFileCheckPointObject = {} as CheckPointObject;
         checkPointProvider = new CheckPointProvider(context, currentFileCheckPointObject);
         vscode.workspace.onDidSaveTextDocument((document: vscode.TextDocument) => {
@@ -77,7 +77,7 @@ describe('CheckPointProvider', () => {
 
         before('Create test file', async () => {
 
-            await createCheckPoints(testFilePath, interval+1);
+            await createCheckPoints(testFilePath, interval + 1);
             testFiles.push(testFilePath);
 
         });
@@ -99,7 +99,7 @@ describe('CheckPointProvider', () => {
         });
 
         it('Should save file content at the interval defined', async () => {
-            const {activeTextEditor} = vscode.window;
+            const { activeTextEditor } = vscode.window;
             checkPointProvider.saveCheckPoint(vscode.window.activeTextEditor?.document as vscode.TextDocument);
             const patchAtInterval = (<CheckPointObject>dataStore[testFilePath]).patches[interval];
 
@@ -120,6 +120,60 @@ describe('CheckPointProvider', () => {
         });
 
     });
+
+    describe('getChildren()', () => {
+
+        const testFilePath = join(__dirname, "get_children_test.txt");
+        const checkpointLength = 3;
+        before('Create test file', async () => {
+
+            await createCheckPoints(testFilePath, checkpointLength);
+            testFiles.push(testFilePath);
+
+        });
+
+        it('Should return array of CheckPointTreeItems with length of checkpoints', async () => {
+            // const checkPointObject = <CheckPointObject>dataStore[testFilePath];
+            const checkPointTreeItems = await checkPointProvider.getChildren();
+            assert(Array.isArray(checkPointTreeItems));
+            assert.equal(checkPointTreeItems.length, checkpointLength);
+
+        });
+
+        after(async () => {
+            await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+        });
+
+    });
+
+    describe('getTreeItem()', () => {
+
+        const testFilePath = join(__dirname, "get_treeitem_test.txt");
+        const checkpointLength = 3;
+        const activeSvg = "garbage";
+        const contextValue = "checkPointItem";
+
+        before('Create test file', async () => {
+
+            await createCheckPoints(testFilePath, checkpointLength);
+            testFiles.push(testFilePath);
+
+        });
+
+        it('Should return CheckPointTreeItems', async () => {
+            const checkPointTreeItems = await checkPointProvider.getChildren();
+            const treeItem: vscode.TreeItem = checkPointProvider.getTreeItem(checkPointTreeItems[checkPointTreeItems.length - 1]);
+            assert.equal(treeItem.contextValue, contextValue);            
+            assert((<string>treeItem.iconPath).includes(activeSvg));
+        });
+
+        after(async () => {
+            await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+        });
+
+    });
+
+
 
     after(() => {
         for (const testFile of testFiles) {
