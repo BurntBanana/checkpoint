@@ -292,7 +292,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
             //If there is only a single CheckPoint in the view.
             if (this.checkPointObject.patches.length === 1 && index === 0) {
                 await this.updateCheckPointObject({} as CheckPointObject).catch(error => reject(false));
-                return Promise.resolve(true);
+                resolve(true);
             }
             //If the last element is being deleted.
             if (index === this.checkPointObject.patches.length - 1) {
