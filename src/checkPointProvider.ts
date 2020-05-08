@@ -292,44 +292,45 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
             //If there is only a single CheckPoint in the view.
             if (this.checkPointObject.patches.length === 1 && index === 0) {
                 await this.updateCheckPointObject({} as CheckPointObject).catch(error => reject(false));
-                resolve(true);
             }
             //If the last element is being deleted.
-            if (index === this.checkPointObject.patches.length - 1) {
-                this.checkPointObject.current = await this.generateFileByPatch(index - 1).catch(error => Promise.reject(false));
-            }
-            else if (index === this.closestCheckPoint(index)) {
-                generatedFile = this.checkPointObject.patches[index] as string;
-            }
-            else {
-                generatedFile = await this.generateFileByPatch(index - 1).catch(error => Promise.reject(false));
-                //Bridge previous and next files by generating a patch.
-                this.checkPointObject.patches[index + 1] = this.dmp.patch_make(generatedFile, await this.generateFileByPatch(index + 1).catch(error => Promise.reject(false)));
-            }
-            this.checkPointObject.patches.splice(index, 1);
-            this.checkPointObject.timestamps.splice(index, 1);
-
-            for (let k = index; k < this.checkPointObject.patches.length; k++) {
-                if (k === this.closestCheckPoint(k)) {
-                    //Generate a file by applying patches as current index is now an interval CheckPoint file.
-                    this.checkPointObject.patches[k] = this.dmp.patch_apply(this.checkPointObject.patches[k] as patch_obj[], generatedFile)[0];
+            else{
+                if (index === this.checkPointObject.patches.length - 1) {
+                    this.checkPointObject.current = await this.generateFileByPatch(index - 1).catch(error => Promise.reject(false));
                 }
-                else if (k === this.closestCheckPoint(k + 1) - 1) {
-                    //Generate a patch as current index is now no longer an interval CheckPoint file.
-                    this.checkPointObject.patches[k] = this.dmp.patch_make(generatedFile, this.checkPointObject.patches[k] as string);
+                else if (index === this.closestCheckPoint(index)) {
+                    generatedFile = this.checkPointObject.patches[index] as string;
                 }
-                generatedFile = await this.generateFileByPatch(k).catch(error => Promise.reject(false));
-            }
-
-            this.updateCheckPointObject(this.checkPointObject).catch(error => reject(error));
-
-            //Active node is deleted
-            if (index === this.checkPointObject.active) {
-                await this.setActiveCheckPoint(this.checkPointObject.active - 1).catch(error => reject(error));
-
-            }
-            else if (index < this.checkPointObject.active) {
-                this.checkPointObject.active -= 1;
+                else {
+                    generatedFile = await this.generateFileByPatch(index - 1).catch(error => Promise.reject(false));
+                    //Bridge previous and next files by generating a patch.
+                    this.checkPointObject.patches[index + 1] = this.dmp.patch_make(generatedFile, await this.generateFileByPatch(index + 1).catch(error => Promise.reject(false)));
+                }
+                this.checkPointObject.patches.splice(index, 1);
+                this.checkPointObject.timestamps.splice(index, 1);
+    
+                for (let k = index; k < this.checkPointObject.patches.length; k++) {
+                    if (k === this.closestCheckPoint(k)) {
+                        //Generate a file by applying patches as current index is now an interval CheckPoint file.
+                        this.checkPointObject.patches[k] = this.dmp.patch_apply(this.checkPointObject.patches[k] as patch_obj[], generatedFile)[0];
+                    }
+                    else if (k === this.closestCheckPoint(k + 1) - 1) {
+                        //Generate a patch as current index is now no longer an interval CheckPoint file.
+                        this.checkPointObject.patches[k] = this.dmp.patch_make(generatedFile, this.checkPointObject.patches[k] as string);
+                    }
+                    generatedFile = await this.generateFileByPatch(k).catch(error => Promise.reject(false));
+                }
+    
+                this.updateCheckPointObject(this.checkPointObject).catch(error => reject(error));
+    
+                //Active node is deleted
+                if (index === this.checkPointObject.active) {
+                    await this.setActiveCheckPoint(this.checkPointObject.active - 1).catch(error => reject(error));
+    
+                }
+                else if (index < this.checkPointObject.active) {
+                    this.checkPointObject.active -= 1;
+                }
             }
             resolve(true);
         });
