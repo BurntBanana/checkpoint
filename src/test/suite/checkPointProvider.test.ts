@@ -1,28 +1,24 @@
 import * as assert from 'assert';
-import { deactivate } from '../../extension';
 import { ExtensionContext, ExtImpl, MemImpl, dataStore } from './createContext';
-import { CheckPointObject, CheckPointTreeItem } from '../..//Interfaces/checkPointInterfaces';
-import { logger, silenceLogs } from '../../logger';
-import { CheckPointExplorer } from '../../checkPointExplorer';
+import { CheckPointObject } from '../..//Interfaces/checkPointInterfaces';
 import * as vscode from 'vscode';
 import { writeFileSync, unlinkSync, readFileSync } from 'fs';
 import { join } from 'path';
-import { CheckPointTreeItemImpl, CheckPointProvider, CheckPointObjectImpl } from '../../checkPointProvider';
+import { CheckPointProvider, CheckPointObjectImpl } from '../../checkPointProvider';
 import { diff_match_patch, patch_obj } from 'diff-match-patch';
-import { error } from 'winston';
 
 const context: ExtensionContext = new ExtImpl([], new MemImpl(), new MemImpl(), "test", "test", "test", __dirname);
 let checkPointProvider: CheckPointProvider;
 
-function createCheckPoints(testFilePath: string, checkpointLength: number = 1, init : boolean = true) {
+function createCheckPoints(testFilePath: string, checkpointLength: number = 1, init: boolean = true) {
     return new Promise(async (resolve) => {
-        if(init){
+        if (init) {
             writeFileSync(testFilePath, "0");
-            await vscode.window.showTextDocument(vscode.Uri.file(testFilePath)).then(undefined, err => {console.error(err);});
+            await vscode.window.showTextDocument(vscode.Uri.file(testFilePath)).then(undefined, err => { console.error(err); });
         }
-        else{
+        else {
             await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
-            await vscode.window.showTextDocument(vscode.Uri.file(testFilePath)).then(undefined, err => {console.error(err);});
+            await vscode.window.showTextDocument(vscode.Uri.file(testFilePath)).then(undefined, err => { console.error(err); });
             const { activeTextEditor } = vscode.window;
             if (activeTextEditor) {
                 const { document } = activeTextEditor;
@@ -34,9 +30,9 @@ function createCheckPoints(testFilePath: string, checkpointLength: number = 1, i
                 }
             }
         }
-        
+
         await checkPointProvider.updateCheckPointObject(new CheckPointObjectImpl(["0"], [new Date(Date.now())], "0", 0))
-        .catch(error => Promise.reject(error));
+            .catch(error => Promise.reject(error));
 
         const { activeTextEditor } = vscode.window;
 
@@ -229,7 +225,7 @@ describe('CheckPointProvider', () => {
             testFiles.push(testFilePath);
 
             await checkPointProvider.updateCheckPointObject({} as CheckPointObject)
-            .catch(error => Promise.reject(error));
+                .catch(error => Promise.reject(error));
 
             assert.deepStrictEqual((<CheckPointObject>dataStore[testFilePath]), null);
         });
@@ -238,7 +234,7 @@ describe('CheckPointProvider', () => {
 
             const checkPointObject = new CheckPointObjectImpl(["1"], [new Date(Date.now())], "1", 1);
             await checkPointProvider.updateCheckPointObject(checkPointObject)
-            .catch(error => Promise.reject(error));
+                .catch(error => Promise.reject(error));
 
             assert.deepStrictEqual((<CheckPointObject>dataStore[testFilePath]), checkPointObject);
         });
@@ -278,7 +274,7 @@ describe('CheckPointProvider', () => {
 
         it('Should update datastore and set file checkpoint if file checkpoint in view is deleted', async () => {
             await createCheckPoints(testFilePath, 3, false);
-            const previousFile:string = await generateFileByPatch(1, testFilePath, interval);
+            const previousFile: string = await generateFileByPatch(1, testFilePath, interval);
             await checkPointProvider.deleteSingleCheckPoint(0);
             const checkPointObject = (<CheckPointObject>dataStore[testFilePath]);
             assert.deepStrictEqual(checkPointObject.patches[0], previousFile);
@@ -287,7 +283,7 @@ describe('CheckPointProvider', () => {
         it('Should update datastore and set patch checkpoint if patch checkpoint in view is deleted', async () => {
             await createCheckPoints(testFilePath, 3, false);
             await checkPointProvider.deleteSingleCheckPoint(1);
-            const lastFile:string = await generateFileByPatch(1, testFilePath, interval);
+            const lastFile: string = await generateFileByPatch(1, testFilePath, interval);
             const checkPointObject = (<CheckPointObject>dataStore[testFilePath]);
             assert.deepStrictEqual(checkPointObject.current, lastFile);
         });
@@ -296,7 +292,7 @@ describe('CheckPointProvider', () => {
             await createCheckPoints(testFilePath, 3, false);
             await checkPointProvider.setActiveCheckPoint(1).catch(error => console.error(error));
             await checkPointProvider.deleteSingleCheckPoint(1).catch(error => console.error(error));
-            const currentActiveFile = readFileSync(testFilePath, {encoding:'utf8', flag:'r'});
+            const currentActiveFile = readFileSync(testFilePath, { encoding: 'utf8', flag: 'r' });
             const checkPointObject = (<CheckPointObject>dataStore[testFilePath]);
             assert.equal(checkPointObject.active, 0);
             assert.deepStrictEqual(checkPointObject.patches[0], currentActiveFile);
@@ -304,9 +300,9 @@ describe('CheckPointProvider', () => {
 
         it('Should decrement only value of active if deleted index is less than active index', async () => {
             await createCheckPoints(testFilePath, 3, false);
-            const previousActiveFile = readFileSync(testFilePath, {encoding:'utf8', flag:'r'});
+            const previousActiveFile = readFileSync(testFilePath, { encoding: 'utf8', flag: 'r' });
             await checkPointProvider.deleteSingleCheckPoint(1);
-            const currentActiveFile = readFileSync(testFilePath, {encoding:'utf8', flag:'r'});
+            const currentActiveFile = readFileSync(testFilePath, { encoding: 'utf8', flag: 'r' });
             const checkPointObject = (<CheckPointObject>dataStore[testFilePath]);
             assert.equal(checkPointObject.active, 1);
             assert.deepStrictEqual(previousActiveFile, currentActiveFile);
@@ -344,18 +340,18 @@ describe('CheckPointProvider', () => {
         it('Should set active checkpoint to passed index', async () => {
             await createCheckPoints(testFilePath, 3, false);
             await checkPointProvider.setActiveCheckPoint(1)
-            .catch(error => console.error(error));
+                .catch(error => console.error(error));
             const checkPointObject = (<CheckPointObject>dataStore[testFilePath]);
             assert.equal(checkPointObject.active, 1);
-            const lastFile:string = await generateFileByPatch(1, testFilePath, interval);
-            const currentActiveFile = readFileSync(testFilePath, {encoding:'utf8', flag:'r'});
+            const lastFile: string = await generateFileByPatch(1, testFilePath, interval);
+            const currentActiveFile = readFileSync(testFilePath, { encoding: 'utf8', flag: 'r' });
             assert.deepStrictEqual(currentActiveFile, lastFile);
         });
 
         after(async () => {
             await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
         });
-    
+
     });
 
     after(() => {

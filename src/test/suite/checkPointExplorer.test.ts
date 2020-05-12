@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import { deactivate } from '../../extension';
 import { ExtensionContext, ExtImpl, MemImpl, dataStore } from './createContext';
-import { logger, silenceLogs } from '../../logger';
+import { silenceLogs } from '../../logger';
 import { CheckPointExplorer } from '../../checkPointExplorer';
 import * as vscode from 'vscode';
 import { writeFileSync, unlinkSync, readFileSync } from 'fs';
@@ -181,7 +181,7 @@ describe('CheckPointExplorer', () => {
         });
 
         it('Should create new checkpoint for unsaved changes', async () => {
-            const {activeTextEditor} = vscode.window;
+            const { activeTextEditor } = vscode.window;
 
             await activeTextEditor?.edit(editBuilder => {
                 editBuilder.insert(new vscode.Position(0, 3), "3");
@@ -218,7 +218,7 @@ describe('CheckPointExplorer', () => {
 
         it('Should not create checkpoint for clean file', async () => {
 
-            const {activeTextEditor} = vscode.window;
+            const { activeTextEditor } = vscode.window;
             await activeTextEditor?.document.save();
             checkPointObject = dataStore[activeTextEditor?.document.fileName as string] as CheckPointObject;
 
@@ -229,7 +229,7 @@ describe('CheckPointExplorer', () => {
         });
 
         it('Should create checkpoint for dirty file', async () => {
-            const {activeTextEditor} = vscode.window;
+            const { activeTextEditor } = vscode.window;
             await activeTextEditor?.edit(editBuilder => {
                 editBuilder.insert(new vscode.Position(0, 1), "1");
             });

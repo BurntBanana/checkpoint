@@ -59,7 +59,7 @@
 		"viewsWelcome": [
 			{
 				"view": "checkPointExplorer",
-				"contents": "No Check Points found [learn more](https://www.npmjs.com/).\n[Commence tracking](command:checkPointExplorer.commenceTracking)"
+				"contents": "No Check Points found [learn more](https://github.com/alexthomas96/checkpoint/blob/master/README.md).\n[Commence tracking](command:checkPointExplorer.commenceTracking)"
 			}
 		],
 		"commands": [
@@ -92,14 +92,6 @@
 				}
 			},
 			{
-				"command": "checkPointExplorer.exportCheckPoints",
-				"title": "Export the Check Points of current file",
-				"icon": {
-					"light": "resources/checkPointIcon.svg",
-					"dark": "resources/checkPointIcon.svg"
-				}
-			},
-			{
 				"command": "checkPointExplorer.setActiveCheckPoint",
 				"title": "Set the Check Point of as active file",
 				"icon": {
@@ -112,11 +104,6 @@
 			"view/title": [
 				{
 					"command": "checkPointExplorer.deleteAllCheckPoints",
-					"when": "view == checkPointExplorer",
-					"group": "navigation"
-				},
-				{
-					"command": "checkPointExplorer.exportCheckPoints",
 					"when": "view == checkPointExplorer",
 					"group": "navigation"
 				}

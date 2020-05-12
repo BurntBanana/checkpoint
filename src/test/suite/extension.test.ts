@@ -4,7 +4,6 @@ import {ExtensionContext, ExtImpl, MemImpl} from './createContext';
 import {logger, silenceLogs} from '../../logger';
 import {commands} from 'vscode';
 
-// const logPath = join(__dirname, "extension")
 const context : ExtensionContext = new ExtImpl([],new MemImpl(),new MemImpl(),"test","test","test",__dirname);
 
 describe('Extension', () => {
@@ -13,7 +12,6 @@ describe('Extension', () => {
         silenceLogs(true);
         extension.activate(context);
     });
-    
     
     it('Should initalise logger with console and file log', () => {
         assert.equal(logger.transports.length, 4);
