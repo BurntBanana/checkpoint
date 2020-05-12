@@ -1,4 +1,4 @@
-import { Workbench, Notification, WebDriver, DialogHandler, TextEditor, EditorView, SideBarView, VSBrowser, NotificationType, ActivityBar, By, WebElementPromise, ViewItem } from 'vscode-extension-tester';
+import { Workbench, Notification, WebDriver, DialogHandler, TextEditor, EditorView, SideBarView, VSBrowser, NotificationType, ActivityBar, By, WebElementPromise, ViewItem, WebElement } from 'vscode-extension-tester';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import { resolve } from 'dns';
@@ -7,16 +7,14 @@ import { join } from 'path';
 
 describe('Checkpoint UI Tests', () => {
 
-    let driver: WebDriver;
     const fileName = "test.txt";
     const testFilePath = join(__dirname, fileName);
     let workbench: Workbench;
-    let activityBar : ActivityBar; 
+    let activityBar: ActivityBar;
 
     before(async () => {
         workbench = new Workbench();
         activityBar = new ActivityBar();
-        driver = VSBrowser.instance.driver;
         writeFileSync(testFilePath, "0");
         const controls = activityBar.getViewControl('CheckPoint');
         await controls.click();
@@ -24,23 +22,28 @@ describe('Checkpoint UI Tests', () => {
 
     describe('Commence tracking', () => {
 
-        before(async () => {
-            await (await driver.findElement(By.xpath("//a[contains(.,'Commence tracking')]"))).click();
-        });
-
         it('Should not start tracking if no active file is present', async () => {
             const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
+            await (await section.findElement(By.xpath("//a[contains(.,'Commence tracking')]"))).click();
             const visibleItems = await section.getVisibleItems();
             assert(visibleItems.length === 0);
         }).timeout(10000);
 
         it('Should start tracking active file if commence tracking is clicked', async () => {
-            driver = VSBrowser.instance.driver;
-            // await workbench.executeCommand("\b" + testFilePath);
-            // await (await driver.findElement(By.xpath("//a[contains(.,'Commence tracking')]"))).click();
+            await workbench.executeCommand("\b" + testFilePath);
             const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
+            await (await section.findElement(By.xpath("//a[contains(.,'Commence tracking')]"))).click();
             const visibleItems = await section.getVisibleItems();
-            assert(visibleItems.length === 1);
+            assert.equal(visibleItems.length, 1);
+        }).timeout(10000);
+    });
+
+    describe('Delete all checkpoints', () => {
+        it('Should show welcome screen when clicked', async () => {
+            const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
+            await section.findElement(By.xpath("(.//div[@class='actions'])[1]//li[@class='action-item']")).click();
+            const visibleItems = await section.getVisibleItems();
+            assert(visibleItems.length === 0);
         }).timeout(10000);
     });
 
