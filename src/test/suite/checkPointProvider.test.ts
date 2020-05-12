@@ -288,10 +288,10 @@ describe('CheckPointProvider', () => {
             assert.deepStrictEqual(checkPointObject.current, lastFile);
         });
 
-        it('Should set previous checkpoint as active if active checkpoint is deleted', async () => {
+        it('Should set next checkpoint as active if active checkpoint is deleted', async () => {
             await createCheckPoints(testFilePath, 3, false);
-            await checkPointProvider.setActiveCheckPoint(1).catch(error => console.error(error));
-            await checkPointProvider.deleteSingleCheckPoint(1).catch(error => console.error(error));
+            await checkPointProvider.setActiveCheckPoint(0).catch(error => console.error(error));
+            await checkPointProvider.deleteSingleCheckPoint(0).catch(error => console.error(error));
             const currentActiveFile = readFileSync(testFilePath, { encoding: 'utf8', flag: 'r' });
             const checkPointObject = (<CheckPointObject>dataStore[testFilePath]);
             assert.equal(checkPointObject.active, 0);

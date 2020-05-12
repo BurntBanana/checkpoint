@@ -321,16 +321,19 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
                     generatedFile = await this.generateFileByPatch(k).catch(error => Promise.reject(false));
                 }
     
-                this.updateCheckPointObject(this.checkPointObject).catch(error => reject(error));
     
                 //Active node is deleted
                 if (index === this.checkPointObject.active) {
-                    await this.setActiveCheckPoint(this.checkPointObject.active - 1).catch(error => reject(error));
+                    await this.setActiveCheckPoint(index === this.checkPointObject.patches.length ? index-1 : index).catch(error => reject(error));
     
                 }
-                else if (index < this.checkPointObject.active) {
-                    this.checkPointObject.active -= 1;
+                else {
+                    if (index < this.checkPointObject.active) {
+                        this.checkPointObject.active -= 1;
+                    }
+                    await this.updateCheckPointObject(this.checkPointObject).catch(error => reject(error));
                 }
+                
             }
             resolve(true);
         });
