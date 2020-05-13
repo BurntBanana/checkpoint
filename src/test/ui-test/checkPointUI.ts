@@ -1,4 +1,4 @@
-import { Workbench, Notification, WebDriver, DialogHandler, TextEditor, EditorView, SideBarView, VSBrowser, NotificationType, ActivityBar, By, WebElementPromise, ViewItem, WebElement } from 'vscode-extension-tester';
+import { Workbench, Notification, WebDriver, DialogHandler, TextEditor, EditorView, SideBarView, VSBrowser, NotificationType, ActivityBar, By, WebElementPromise, ViewItem, WebElement, until } from 'vscode-extension-tester';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import { resolve } from 'dns';
@@ -35,14 +35,14 @@ describe('Checkpoint UI Tests', () => {
             await (await section.findElement(By.xpath("//a[contains(.,'Commence tracking')]"))).click();
             const visibleItems = await section.getVisibleItems();
             assert.equal(visibleItems.length, 1);
-        }).timeout(10000);
+        }).timeout(20000);
     });
 
     describe('Delete all checkpoints', () => {
         it('Should show welcome screen when clicked', async () => {
-            const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
-            await section.findElement(By.xpath("(.//div[@class='actions'])[1]//li[@class='action-item']")).click();
-            const visibleItems = await section.getVisibleItems();
+            const sideBar = await new SideBarView();
+            await (await sideBar.getTitlePart().getAction('Delete all Check Points of current file')).click();
+            const visibleItems = await (await sideBar.getContent().getSection('CheckPoint Explorer')).getVisibleItems();
             assert(visibleItems.length === 0);
         }).timeout(10000);
     });

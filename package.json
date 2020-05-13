@@ -93,7 +93,7 @@
 			},
 			{
 				"command": "checkPointExplorer.setActiveCheckPoint",
-				"title": "Set the Check Point of as active file",
+				"title": "Set the Check Point as active",
 				"icon": {
 					"light": "resources/checkPointIcon.svg",
 					"dark": "resources/checkPointIcon.svg"
