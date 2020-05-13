@@ -1,14 +1,14 @@
-import { Workbench, Notification, WebDriver, DialogHandler, TextEditor, EditorView, SideBarView, VSBrowser, NotificationType, ActivityBar, By, WebElementPromise, ViewItem, WebElement, until } from 'vscode-extension-tester';
+import { Workbench, Notification, WebDriver, DialogHandler, TextEditor, EditorView, SideBarView, VSBrowser, NotificationType, ActivityBar, By, WebElementPromise, ViewItem, WebElement, until, TreeItem } from 'vscode-extension-tester';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import { resolve } from 'dns';
-import { writeFileSync } from 'fs';
+import { writeFileSync, readFileSync } from 'fs';
 import { join } from 'path';
-
 describe('Checkpoint UI Tests', () => {
 
     const fileName = "test.txt";
     const testFilePath = join(__dirname, fileName);
+    const timeout = 20000;
     let workbench: Workbench;
     let activityBar: ActivityBar;
 
@@ -27,25 +27,118 @@ describe('Checkpoint UI Tests', () => {
             await (await section.findElement(By.xpath("//a[contains(.,'Commence tracking')]"))).click();
             const visibleItems = await section.getVisibleItems();
             assert(visibleItems.length === 0);
-        }).timeout(10000);
+        }).timeout(timeout);
 
         it('Should start tracking active file if commence tracking is clicked', async () => {
+            const sideBar = new SideBarView();
             await workbench.executeCommand("\b" + testFilePath);
-            const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
+            const section = await sideBar.getContent().getSection('CheckPoint Explorer');
             await (await section.findElement(By.xpath("//a[contains(.,'Commence tracking')]"))).click();
-            const visibleItems = await section.getVisibleItems();
+            const visibleItems = await (await sideBar.getContent().getSection('CheckPoint Explorer')).getVisibleItems();
             assert.equal(visibleItems.length, 1);
-        }).timeout(20000);
+        }).timeout(timeout);
+    });
+
+    describe('Open checkpoint', () => {
+        it('Should not create checkpoint if there are no unsaved changes', async () => {
+            const editorView = new EditorView();
+            const editor = new TextEditor(editorView, fileName);
+            await editor.setText('1');
+            await editor.save();
+
+            const visibleItems = await (await new SideBarView().getContent().getSection('CheckPoint Explorer')).getVisibleItems();
+            await visibleItems[0].click();
+
+            assert.equal(await editor.getText(), "0");
+            assert.equal(visibleItems.length, 2);
+
+        }).timeout(timeout);
+
+        it('Should create new checkpoint and open selected index if there are unsaved changes', async () => {
+            const editorView = new EditorView();
+            const editor = new TextEditor(editorView, fileName);
+            const sideBar = new SideBarView();
+            await editor.setText('2');
+
+            const visibleItemsOld = await (await sideBar.getContent().getSection('CheckPoint Explorer')).getVisibleItems();
+            await visibleItemsOld[1].click();
+            const visibleItemsNew = await (await sideBar.getContent().getSection('CheckPoint Explorer')).getVisibleItems();
+
+            assert.equal(await editor.getText(), "1");
+            assert.equal(visibleItemsNew.length, visibleItemsOld.length + 1);
+
+
+        }).timeout(timeout);
+    });
+
+    describe('Set active checkpoint', () => {
+        it('Should set selected index as active and change icon', async () => {
+            const activeIndex = 1;
+            const activeIcon = "garbage";
+
+            const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
+            const visibleItems = await section.getVisibleItems();
+            //click active element
+            await (await section.findElement(By.xpath(".//div[@role='treeitem' and @data-index='" + activeIndex + "']//li[@class='action-item']/a[contains(@title,'active')]"))).click();
+            await visibleItems[activeIndex].findElement(By.xpath(".//div[@class='custom-view-tree-node-item-icon' and contains(@style, "+activeIcon+")]"))
+                .catch(error => { assert.fail("Checkpoint is not active at index: " + activeIndex); });
+            assert.equal(readFileSync(testFilePath, { encoding: 'utf8', flag: 'r' }), activeIndex);
+        }).timeout(timeout);
+    });
+
+    describe('Editor switch', () => {
+
+        const newFileName = "editor_test.txt";
+        const newFilePath = join(__dirname, newFileName);
+
+        before(async () => {
+            writeFileSync(newFilePath, "0");
+        });
+
+        it('Should show welcome screen if editor is switched to untracked file', async () => {
+            await workbench.executeCommand("\b" + newFilePath);
+            const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
+            const sectionText = await section.getText();
+            assert(sectionText.includes("Commence tracking"));
+        }).timeout(timeout);
+
+        it('Should update tree view when editor is switched', async () => {
+            await workbench.executeCommand("\b" + fileName);    
+            const visibleItems = await (await new SideBarView().getContent().getSection('CheckPoint Explorer')).getVisibleItems();
+            assert(visibleItems.length);
+        }).timeout(timeout);
+
+        after(() => {
+            fs.unlinkSync(newFilePath);
+        });
+    });
+
+    describe('Delete single checkpoint', () => {
+        it('Should delete checkpoint at given index', async () => {
+            const deleteIndex = 2;
+            const sideBar = new SideBarView();
+            const section = await sideBar.getContent().getSection('CheckPoint Explorer');
+            const visibleItemsOld = await section.getVisibleItems();
+            const deleteElement = visibleItemsOld[deleteIndex] as TreeItem;
+            await deleteElement.click();
+            await (await deleteElement.getActionButton('Delete a particular Check Point'))?.click();
+            const visibleItemsNew = await (await sideBar.getContent().getSection('CheckPoint Explorer')).getVisibleItems();
+            assert.equal(visibleItemsNew.length, visibleItemsOld.length - 1);
+        }).timeout(timeout);
+
     });
 
     describe('Delete all checkpoints', () => {
-        it('Should show welcome screen when clicked', async () => {
+        it('Should clear all checkpoints when delete all button is clicked', async () => {
+            const deleteLabel = "Delete all Check Points of current file";
             const sideBar = await new SideBarView();
-            await (await sideBar.getTitlePart().getAction('Delete all Check Points of current file')).click();
+            await (await sideBar.getTitlePart().getAction(deleteLabel)).click();
             const visibleItems = await (await sideBar.getContent().getSection('CheckPoint Explorer')).getVisibleItems();
             assert(visibleItems.length === 0);
-        }).timeout(10000);
+        }).timeout(timeout);
     });
+
+
 
     // it('Command shows a notification with the correct text', async function () {
     //     this.timeout(10000);
@@ -97,7 +190,7 @@ describe('Checkpoint UI Tests', () => {
     //     fs.writeFileSync('test-resources/image.png', screenshot , {encoding: 'base64'}); 
     // });
 
-    after(() => {
+    after(async () => {
         fs.unlinkSync(testFilePath);
     });
 });
