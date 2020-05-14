@@ -44,7 +44,9 @@ export class CheckPointExplorer {
             )));
         context.subscriptions.push(vscode.commands.registerCommand('checkPointExplorer.deleteAllCheckPoints', () => this.deleteCheckPoints()));
         context.subscriptions.push(vscode.commands.registerCommand('checkPointExplorer.deleteCheckPoint',
-            element => this.treeDataProvider?.deleteSingleCheckPoint(element.index).catch(
+            element => this.treeDataProvider?.deleteSingleCheckPoint(element.index)
+            .then((checkPointObject) => this.currentFileCheckPointObject = checkPointObject)
+            .catch(
                 error => logger.warn("Delete checkpoint failed for index: " + element.index)
             )));
         context.subscriptions.push(vscode.commands.registerCommand('checkPointExplorer.setActiveCheckPoint',

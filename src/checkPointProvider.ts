@@ -284,7 +284,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
      * @returns void
      *
      */
-    deleteSingleCheckPoint(index: number): Promise<boolean> {
+    deleteSingleCheckPoint(index: number): Promise<CheckPointObject> {
         return new Promise(async (resolve, reject) => {
             let generatedFile: string = "";
             logger.info("Deleing checkpoint: " + index);
@@ -335,7 +335,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
                 }
                 
             }
-            resolve(true);
+            resolve(this.checkPointObject);
         });
 
     }
