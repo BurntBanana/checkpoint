@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 import {join, resolve} from 'path';
 
 let logger : Logger;
-let makeSilent:boolean = true;
+let makeSilent:boolean = false;
 
 /**
  * Creates a `winston.Logger` with custom transports.

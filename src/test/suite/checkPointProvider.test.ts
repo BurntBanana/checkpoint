@@ -185,7 +185,7 @@ describe('CheckPointProvider', () => {
 
         const testFilePath = join(__dirname, "get_treeitem_test.txt");
         const checkpointLength = 3;
-        const activeSvg = "garbage";
+        const activeSvg = "active";
         const contextValue = "checkPointItem";
 
         before('Create test file', async () => {

@@ -2,7 +2,7 @@ import { Workbench, TextEditor, EditorView, SideBarView, ActivityBar, By, TreeIt
 import * as assert from 'assert';
 import { unlinkSync } from 'fs';
 import { writeFileSync, readFileSync } from 'fs';
-import { join } from 'path';
+import { join } from 'path'; 
 
 describe('Checkpoint UI Tests', () => {
 
@@ -74,7 +74,7 @@ describe('Checkpoint UI Tests', () => {
     describe('Set active checkpoint', () => {
         it('Should set selected index as active and change icon', async () => {
             const activeIndex = 1;
-            const activeIcon = "garbage";
+            const activeIcon = "active";
 
             const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
             const visibleItems = await section.getVisibleItems();

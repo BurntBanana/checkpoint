@@ -217,7 +217,7 @@ export class CheckPointProvider implements vscode.TreeDataProvider<CheckPointTre
     */
     getTreeItem(element: CheckPointTreeItem): vscode.TreeItem {
         const treeItem = new vscode.TreeItem(dateFormat(element.timestamp));
-        let resourcePath: string = join(__dirname, '..', 'resources', element.index === this.checkPointObject.active ? '/garbage.svg' : '/checkPointIcon.svg');
+        let resourcePath: string = join(__dirname, '..', 'resources', element.index === this.checkPointObject.active ? '/active.svg' : '/normal.svg');
         treeItem.contextValue = "checkPointItem";
         treeItem.iconPath = resourcePath;
         treeItem.collapsibleState = vscode.TreeItemCollapsibleState.None;
