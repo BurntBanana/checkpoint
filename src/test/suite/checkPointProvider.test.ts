@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { ExtensionContext, ExtImpl, MemImpl, dataStore } from './createContext';
-import { CheckPointObject } from '../..//Interfaces/checkPointInterfaces';
+import { CheckPointObject } from '../../Interfaces/CheckPointInterfaces';
 import * as vscode from 'vscode';
 import { writeFileSync, unlinkSync, readFileSync } from 'fs';
 import { join } from 'path';

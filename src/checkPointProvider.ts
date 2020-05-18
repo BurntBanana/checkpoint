@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { CheckPointObject, CheckPointTreeItem } from './Interfaces/checkPointInterfaces';
+import { CheckPointObject, CheckPointTreeItem } from './Interfaces/CheckPointInterfaces';
 import { join, } from 'path';
 import { diff_match_patch, patch_obj } from 'diff-match-patch';
 import * as dateFormat from 'dateformat';

@@ -2,11 +2,11 @@ import * as assert from 'assert';
 import { deactivate } from '../../extension';
 import { ExtensionContext, ExtImpl, MemImpl, dataStore } from './createContext';
 import { silenceLogs } from '../../logger';
-import { CheckPointExplorer } from '../../checkPointExplorer';
+import { CheckPointExplorer } from '../../CheckPointExplorer';
 import * as vscode from 'vscode';
 import { writeFileSync, unlinkSync, readFileSync } from 'fs';
 import { join } from 'path';
-import { CheckPointObject } from '../../Interfaces/checkPointInterfaces';
+import { CheckPointObject } from '../../Interfaces/CheckPointInterfaces';
 import { CheckPointTreeItemImpl } from '../../checkPointProvider';
 import { diff_match_patch, patch_obj } from 'diff-match-patch';
 

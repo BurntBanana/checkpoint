@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { CheckPointObject, CheckPointTreeItem } from './Interfaces/checkPointInterfaces';
+import { CheckPointObject, CheckPointTreeItem } from './Interfaces/CheckPointInterfaces';
 import { logger, initLogger } from './logger';
 import { CheckPointProvider, CheckPointObjectImpl } from './checkPointProvider';
 /**
