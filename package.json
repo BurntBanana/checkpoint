@@ -1,10 +1,10 @@
 {
 	"name": "checkpoint",
 	"displayName": "Checkpoint",
-	"description": "Ez file saving",
+	"description": "Easy file state tracking",
 	"version": "0.0.1",
-	"publisher": "babu",
-	"repository": "https://github.com/alexthomas96/checkpoint",
+	"publisher": "BurntBanana",
+	"repository": "https://github.com/BurntBanana/checkpoint",
 	"engines": {
 		"vscode": "^1.44.0"
 	},
