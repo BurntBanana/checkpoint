@@ -27,9 +27,9 @@ steps:
   condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
 - bash: |
-    echo ">>> Compile checkpoint"
-    npm install && npm run compile
-    echo ">>> Compiled checkpoint"
+    echo ">>> Installing checkpoint dependencies"
+    npm install
+    echo ">>> Installed checkpoint dependencies"
     echo ">>> Run sample integration test"
     npm run test
   displayName: Run Tests
