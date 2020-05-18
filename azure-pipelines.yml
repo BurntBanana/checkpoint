@@ -28,7 +28,7 @@ steps:
 
 - bash: |
     echo ">>> Compile checkpoint"
-    npm run compile
+    npm install && npm run compile
     echo ">>> Compiled checkpoint"
     echo ">>> Run sample integration test"
     npm run test
