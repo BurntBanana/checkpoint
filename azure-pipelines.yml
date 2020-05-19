@@ -28,11 +28,14 @@ steps:
 
 - bash: |
     echo ">>> Installing checkpoint dependencies"
-    npm install && echo ">>> Installed checkpoint dependencies"
+    npm install
+    echo ">>> Installed checkpoint dependencies"
     echo ">>> Running unit tests"
-    npm run test && echo ">>> Unit tests completed"
+    npm run test
+    echo ">>> Unit tests completed"
     echo ">>> Running UI tests"
-    npm run ui-test && echo ">>> UI tests completed"
+    npm run ui-test
+    echo ">>> UI tests completed"
   displayName: Run Tests
   env:
     DISPLAY: ':99.0'
