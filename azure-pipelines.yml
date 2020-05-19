@@ -33,9 +33,6 @@ steps:
     echo ">>> Running unit tests"
     npm run test
     echo ">>> Unit tests completed"
-    echo ">>> Running UI tests"
-    npm run ui-test
-    echo ">>> UI tests completed"
   displayName: Run Tests
   env:
     DISPLAY: ':99.0'
