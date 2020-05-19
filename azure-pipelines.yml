@@ -43,4 +43,6 @@ steps:
       echo ">>> Running UI tests"
       npm run ui-test
       echo ">>> UI tests completed"
+    failOnStderr: true
+    condition: eq(variables['Agent.JobStatus'], 'SucceededWithIssues')
     displayName: Run UI Tests
