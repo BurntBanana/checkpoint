@@ -41,6 +41,6 @@ steps:
 
   - bash: |
       echo ">>> Running UI tests"
-      /usr/bin/xvfb-run npm run ui-test
+      npm run ui-test
       echo ">>> UI tests completed"
     displayName: Run UI Tests
