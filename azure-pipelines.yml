@@ -1,38 +1,48 @@
 trigger:
-- master
+  - master
 
 strategy:
   matrix:
     linux:
-      imageName: 'ubuntu-latest'
+      imageName: "ubuntu-latest"
     mac:
-      imageName: 'macOS-latest'
+      imageName: "macOS-latest"
     windows:
-      imageName: 'windows-latest'
+      imageName: "windows-latest"
 
 pool:
   vmImage: $(imageName)
 
 steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: "10.x"
+    displayName: "Install Node.js"
 
-- task: NodeTool@0
-  inputs:
-    versionSpec: '10.x'
-  displayName: 'Install Node.js'
+  - bash: |
+      echo ">>> Installing checkpoint dependencies"
+      npm install
+      echo ">>> Installed checkpoint dependencies"
+    displayName: "Install packages"
 
-- bash: |
-    /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-    echo ">>> Started xvfb"
-  displayName: Start xvfb
-  condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+  - bash: |
+      /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+      echo ">>> Started xvfb"
+    displayName: Start xvfb
+    condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
 
-- bash: |
-    echo ">>> Installing checkpoint dependencies"
-    npm install
-    echo ">>> Installed checkpoint dependencies"
-    echo ">>> Running unit tests"
-    npm run test
-    echo ">>> Unit tests completed"
-  displayName: Run Tests
-  env:
-    DISPLAY: ':99.0'
+  - bash: |
+      echo ">>> Running unit tests"
+      npm run test
+      echo ">>> Unit tests completed"
+    displayName: Run Tests
+    env:
+      DISPLAY: ":99.0"
+
+  - bash: |
+      echo ">>> Running UI tests"
+      npm run ui-test
+      echo ">>> UI tests completed"
+    displayName: Run UI Tests
+    env:
+      DISPLAY: ":99.0"
