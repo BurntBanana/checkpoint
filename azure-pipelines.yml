@@ -41,8 +41,6 @@ steps:
 
   - bash: |
       echo ">>> Running UI tests"
-      npm run ui-test
+      xvfb-run npm run ui-test
       echo ">>> UI tests completed"
     displayName: Run UI Tests
-    env:
-      DISPLAY: ":99.0"
