@@ -19,13 +19,5 @@ describe('Logger', () => {
         initLogger(__dirname);
         assert.equal(logger.transports.length, 4); //circular, console, file, error file 
     });
-    after(() => {
-        return new Promise(resolve => {
-            const config = workspace.getConfiguration('checkpoint');
-            unlinkSync(join(__dirname, config.get('logFile') as string));
-            unlinkSync(join(__dirname, config.get('errorLogFile') as string));
-            resolve(true);
-        });
-    });
 
 });

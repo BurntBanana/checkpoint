@@ -353,15 +353,4 @@ describe('CheckPointProvider', () => {
         });
 
     });
-
-    after(() => {
-        return new Promise (resolve => {
-            for (const testFile of testFiles) {
-                unlinkSync(testFile);
-            }
-            resolve(true);
-        });
-        
-    });
-
 });

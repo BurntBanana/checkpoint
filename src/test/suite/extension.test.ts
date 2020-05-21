@@ -29,9 +29,6 @@ describe('Extension', () => {
     });
 
     after(() => {
-        return new Promise(resolve => {
-            extension.deactivate(context);
-            resolve(true);
-        });
+        extension.deactivate(context);
     });
 });
