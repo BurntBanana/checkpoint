@@ -248,9 +248,12 @@ describe('CheckPointExplorer', () => {
     });
 
     after(() => {
-        deactivate(context);
-        for (const testFile of testFiles) {
-            unlinkSync(testFile);
-        }
+        return new Promise(resolve => {
+            deactivate(context);
+            for (const testFile of testFiles) {
+                unlinkSync(testFile);
+            }
+            resolve(true);
+        });
     });
 });
