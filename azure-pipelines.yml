@@ -49,6 +49,7 @@ steps:
     condition: succeededOrFailed()
 
   - task: PublishCodeCoverageResults@1
+    displayName: 'Publish Code Coverage'
     inputs:
       codeCoverageTool: 'cobertura'
       summaryFileLocation: coverage/cobertura-coverage.xml
