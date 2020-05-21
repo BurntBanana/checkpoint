@@ -332,7 +332,7 @@ describe('CheckPointProvider', () => {
             testFiles.push(testFilePath);
             await assert.rejects(
                 () => checkPointProvider.setActiveCheckPoint(2),
-                /true/,
+                /false/,
                 'Promise not rejected with value false'
             );
         });
