@@ -1,5 +1,5 @@
 trigger:
-  - master
+  - codecov
 
 strategy:
   matrix:
@@ -37,6 +37,6 @@ steps:
     inputs:
       command: custom
       verbose: false
-      customCommand: 'test'
+      customCommand: 'run test-coverage'
     env:
       DISPLAY: ":99.0"

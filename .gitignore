@@ -4,3 +4,5 @@ node_modules
 *.vsix
 dist
 test-resources/
+coverage
+out-cov

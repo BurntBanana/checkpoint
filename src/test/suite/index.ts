@@ -1,12 +1,21 @@
 import * as path from 'path';
 import * as Mocha from 'mocha';
 import * as glob from 'glob';
+import { createReport } from '../coverage';
 
 export function run(): Promise<void> {
 	// Create the mocha test
 	const mocha = new Mocha({
 		ui: 'bdd',
-		color: true
+		color: true,
+		timeout: 7500,
+		reporter: "mocha-multi-reporters",
+		reporterOptions: {
+			reporterEnabled: "spec, xunit",
+			xunitReporterOptions: {
+				output: path.join(__dirname, "..", "..", "test-results.xml")
+			}
+		}
 	});
 
 	const testsRoot = path.resolve(__dirname, '..');
@@ -34,5 +43,10 @@ export function run(): Promise<void> {
 				e(err);
 			}
 		});
+	}).then(() => {
+		// Tests have finished executing, check if we should generate a coverage report
+		if (process.env['GENERATE_COVERAGE']) {
+			createReport();
+		}
 	});
 }
