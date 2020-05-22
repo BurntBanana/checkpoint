@@ -1,8 +1,9 @@
 # Checkpoint Visual Studio Code Extension
-![Azure DevOps builds](https://img.shields.io/azure-devops/build/burntbanana/bf09ccc0-ee73-42e3-b92a-2e3ed1269966/1?style=plastic) ![Azure DevOps builds (branch)](https://img.shields.io/azure-devops/build/burntbanana/bf09ccc0-ee73-42e3-b92a-2e3ed1269966/1/codecov?label=build%20codecov) ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/burntbanana/checkpoint/1?style=flat-square) [![codecov](https://codecov.io/gh/BurntBanana/checkpoint/branch/master/graph/badge.svg)](https://codecov.io/gh/BurntBanana/checkpoint/)
+![Azure DevOps builds (branch)](https://img.shields.io/azure-devops/build/burntbanana/bf09ccc0-ee73-42e3-b92a-2e3ed1269966/1/master?style=flat&logo=azure-pipelines) ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/burntbanana/checkpoint/1?style=flat&logo=mocha) [![codecov](https://codecov.io/gh/BurntBanana/checkpoint/branch/master/graph/badge.svg)](https://codecov.io/gh/BurntBanana/checkpoint/)
 
 See features below. 
-
+Code Coverage graph: 
+![Code Coverage graph](https://codecov.io/gh/BurntBanana/checkpoint/branch/master/graph/sunburst.svg "Code Coverage graph")
 ## Features
 
 Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
