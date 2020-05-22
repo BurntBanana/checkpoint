@@ -55,6 +55,16 @@ describe('Checkpoint UI Tests', () => {
     });
 
     describe('Open checkpoint', () => {
+
+        beforeEach(async () => {
+            try {
+                const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
+            } catch (error) {
+                const controls = activityBar.getViewControl('CheckPoint');
+                await controls.click();
+            }
+        });
+
         it('Should not create checkpoint if there are no unsaved changes', async () => {
             const editorView = new EditorView();
             const editor = new TextEditor(editorView, fileName);
