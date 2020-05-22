@@ -38,12 +38,10 @@ export function initLogger(logPath:string):void {
             consoleTransport
         ],
         format: format.combine(
-            // format.colorize({ colors: { info: 'blue', error: 'red' , warn: 'yellow'}}),
             format.timestamp({
               format: 'YYYY-MM-DD HH:mm:ss'
             }),
             format.printf(info => `${dateColorizer.colorize(info.level, info.timestamp)} [${info.level}] ${info.message}`)
-            // format.printf(info => (info.level, `[${info.timestamp}] [${info.level}] ${info.message}`))
         ),
         exceptionHandlers: [
             consoleTransport

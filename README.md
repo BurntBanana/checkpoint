@@ -1,4 +1,5 @@
-# checkpoint README
+# Checkpoint Visual Studio Code Extension
+![Azure DevOps builds](https://img.shields.io/azure-devops/build/burntbanana/bf09ccc0-ee73-42e3-b92a-2e3ed1269966/1?style=plastic) ![Azure DevOps builds (branch)](https://img.shields.io/azure-devops/build/burntbanana/bf09ccc0-ee73-42e3-b92a-2e3ed1269966/1/codecov?label=build%20codecov) ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/burntbanana/checkpoint/1?style=flat-square) ![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/burntbanana/checkpoint/1?style=for-the-badge)
 
 See features below. 
 
