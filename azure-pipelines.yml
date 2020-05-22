@@ -1,9 +1,6 @@
 trigger:
   - codecov
 
-variables:
-  disable.coverage.autogenerate: 'true'  
-
 strategy:
   matrix:
     linux:
