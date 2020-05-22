@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	}
 	else {
-		logger.error("Context is undefined.");
+		throw new Error("Context is undefined");
 	}
 }
 

@@ -21,11 +21,14 @@ describe('Extension', () => {
         assert.equal(context.subscriptions.length, 5);
     });
 
-
     it('Should dispose off registered commands', () => {
         extension.deactivate(context);
         context.subscriptions.push(commands.registerCommand('checkPointExplorer.commenceTracking', () => { }));
         assert.equal(context.subscriptions.length, 6);
+    });
+
+    it('Should throw error if context is not defined', () => {
+        assert.throws(() => extension.activate(undefined as unknown as ExtensionContext), /^Error: Context is undefined$/);
     });
 
     after(() => {
