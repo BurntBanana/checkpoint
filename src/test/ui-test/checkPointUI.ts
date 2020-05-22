@@ -1,8 +1,8 @@
-import { Workbench, TextEditor, EditorView, SideBarView, ActivityBar, By, TreeItem } from 'vscode-extension-tester';
+import { Workbench, TextEditor, EditorView, SideBarView, ActivityBar, By, TreeItem, VSBrowser, until } from 'vscode-extension-tester';
 import * as assert from 'assert';
 import { unlinkSync } from 'fs';
 import { writeFileSync, readFileSync } from 'fs';
-import { join } from 'path'; 
+import { join } from 'path';
 
 describe('Checkpoint UI Tests', () => {
 
@@ -13,11 +13,18 @@ describe('Checkpoint UI Tests', () => {
     let activityBar: ActivityBar;
 
     before(async () => {
+        const driver = VSBrowser.instance.driver;
+
         workbench = new Workbench();
         activityBar = new ActivityBar();
         writeFileSync(testFilePath, "0");
         const controls = activityBar.getViewControl('CheckPoint');
         await controls.click();
+        try {
+            const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
+        } catch (error) {
+            await controls.click();
+        }
     });
 
     describe('Commence tracking', () => {
