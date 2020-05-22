@@ -19,8 +19,8 @@ describe('Checkpoint UI Tests', () => {
         activityBar = new ActivityBar();
         writeFileSync(testFilePath, "0");
         const controls = activityBar.getViewControl('CheckPoint');
-        await controls.click();
         try {
+            await controls.click();
             const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
         } catch (error) {
             await controls.click();
@@ -28,6 +28,15 @@ describe('Checkpoint UI Tests', () => {
     });
 
     describe('Commence tracking', () => {
+
+        beforeEach(async () => {
+            try {
+                const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
+            } catch (error) {
+                const controls = activityBar.getViewControl('CheckPoint');
+                await controls.click();
+            }
+        });
 
         it('Should not start tracking if no active file is present', async () => {
             const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
@@ -37,11 +46,10 @@ describe('Checkpoint UI Tests', () => {
         }).timeout(timeout);
 
         it('Should start tracking active file if commence tracking is clicked', async () => {
-            const sideBar = new SideBarView();
             await workbench.executeCommand("\b" + testFilePath);
-            const section = await sideBar.getContent().getSection('CheckPoint Explorer');
+            const section = await new SideBarView().getContent().getSection('CheckPoint Explorer');
             await (await section.findElement(By.xpath("//a[contains(.,'Commence tracking')]"))).click();
-            const visibleItems = await (await sideBar.getContent().getSection('CheckPoint Explorer')).getVisibleItems();
+            const visibleItems = await (await new SideBarView().getContent().getSection('CheckPoint Explorer')).getVisibleItems();
             assert.equal(visibleItems.length, 1);
         }).timeout(timeout);
     });
