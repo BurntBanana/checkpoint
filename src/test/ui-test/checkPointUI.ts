@@ -55,15 +55,14 @@ describe('Checkpoint UI Tests', () => {
         }).timeout(timeout);
 
         it('Should create new checkpoint and open selected index if there are unsaved changes', async () => {
-            const editorView = new EditorView();
-            const editor = new TextEditor(editorView, fileName);
+            let editor = new TextEditor(new EditorView(), fileName);
             const sideBar = new SideBarView();
             await editor.setText('2');
 
             const visibleItemsOld = await (await sideBar.getContent().getSection('CheckPoint Explorer')).getVisibleItems();
             await visibleItemsOld[1].click();
             const visibleItemsNew = await (await sideBar.getContent().getSection('CheckPoint Explorer')).getVisibleItems();
-
+            editor = new TextEditor(new EditorView(), fileName);
             assert.equal(await editor.getText(), "1");
             assert.equal(visibleItemsNew.length, visibleItemsOld.length + 1);
 
