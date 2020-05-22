@@ -57,11 +57,9 @@ steps:
     condition: succeededOrFailed()
   
   - bash: |
-      bash <(curl https://codecov.io/bash) -t $TOKEN -f coverage/cobertura-coverage.xml
-    displayName: 'codecov'
+      bash <(curl https://codecov.io/bash) -f coverage/cobertura-coverage.xml
+    displayName: 'Upload to codecov'
     condition: succeededOrFailed()
-    env:
-      TOKEN: $(CODECOV_TOKEN)
       
   - task: CopyFiles@2
     inputs:
