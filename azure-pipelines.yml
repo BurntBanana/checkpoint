@@ -45,13 +45,13 @@ steps:
     displayName: 'Publish Test Results'
     inputs:
       testResultsFiles: 'out-cov/*-results.xml'
-      testRunTitle: '$(Agent.OS)-$(node_version)'
+      testRunTitle: '$(Agent.OS)-Tests'
     condition: succeededOrFailed()
 
   - task: PublishCodeCoverageResults@1
     displayName: 'Publish Code Coverage'
     inputs:
-      codeCoverageTool: 'cobertura'
+      codeCoverageTool: 'Cobertura'
       summaryFileLocation: coverage/cobertura-coverage.xml
       reportDirectory: coverage/lcov-report
     condition: succeededOrFailed()
@@ -73,4 +73,4 @@ steps:
     displayName: 'Publish Coverage Artifact'
     inputs:
       targetPath: $(Build.ArtifactStagingDirectory)
-      artifactName: 'coverage-$(Agent.OS)-$(node_version)'
+      artifactName: 'coverage-$(Agent.OS)'
