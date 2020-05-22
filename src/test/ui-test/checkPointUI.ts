@@ -46,36 +46,36 @@ describe('Checkpoint UI Tests', () => {
         }).timeout(timeout);
     });
 
-    // describe('Open checkpoint', () => {
-    //     it('Should not create checkpoint if there are no unsaved changes', async () => {
-    //         const editorView = new EditorView();
-    //         const editor = new TextEditor(editorView, fileName);
-    //         await editor.setText('1');
-    //         await editor.save();
+    describe('Open checkpoint', () => {
+        it('Should not create checkpoint if there are no unsaved changes', async () => {
+            const editorView = new EditorView();
+            const editor = new TextEditor(editorView, fileName);
+            await editor.setText('1');
+            await editor.save();
 
-    //         const visibleItems = await (await new SideBarView().getContent().getSection('CheckPoint Explorer')).getVisibleItems();
-    //         await visibleItems[0].click();
+            const visibleItems = await (await new SideBarView().getContent().getSection('CheckPoint Explorer')).getVisibleItems();
+            await visibleItems[0].click();
 
-    //         assert.equal(await editor.getText(), "0");
-    //         assert.equal(visibleItems.length, 2);
+            assert.equal(await editor.getText(), "0");
+            assert.equal(visibleItems.length, 2);
 
-    //     }).timeout(timeout);
+        }).timeout(timeout);
 
-    //     it('Should create new checkpoint and open selected index if there are unsaved changes', async () => {
-    //         let editor = new TextEditor(new EditorView(), fileName);
-    //         const sideBar = new SideBarView();
-    //         await editor.setText('2');
+        it('Should create new checkpoint and open selected index if there are unsaved changes', async () => {
+            let editor = new TextEditor(new EditorView(), fileName);
+            const sideBar = new SideBarView();
+            await editor.setText('2');
 
-    //         const visibleItemsOld = await (await sideBar.getContent().getSection('CheckPoint Explorer')).getVisibleItems();
-    //         await visibleItemsOld[1].click();
-    //         const visibleItemsNew = await (await sideBar.getContent().getSection('CheckPoint Explorer')).getVisibleItems();
-    //         editor = new TextEditor(new EditorView(), fileName);
-    //         assert.equal(await editor.getText(), "1");
-    //         assert.equal(visibleItemsNew.length, visibleItemsOld.length + 1);
+            const visibleItemsOld = await (await sideBar.getContent().getSection('CheckPoint Explorer')).getVisibleItems();
+            await visibleItemsOld[1].click();
+            const visibleItemsNew = await (await sideBar.getContent().getSection('CheckPoint Explorer')).getVisibleItems();
+            editor = new TextEditor(new EditorView(), fileName);
+            assert.equal(await editor.getText(), "1");
+            assert.equal(visibleItemsNew.length, visibleItemsOld.length + 1);
 
 
-    //     }).timeout(timeout);
-    // });
+        }).timeout(timeout);
+    });
 
     // describe('Set active checkpoint', () => {
     //     it('Should set selected index as active and change icon', async () => {
