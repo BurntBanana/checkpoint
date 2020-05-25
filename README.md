@@ -1,5 +1,5 @@
 # Checkpoint Visual Studio Code Extension
-![Azure DevOps builds (branch)](https://img.shields.io/azure-devops/build/burntbanana/bf09ccc0-ee73-42e3-b92a-2e3ed1269966/1/master?style=flat&logo=azure-pipelines) ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/burntbanana/checkpoint/1?style=flat&logo=mocha) [![codecov](https://codecov.io/gh/BurntBanana/checkpoint/branch/master/graph/badge.svg)](https://codecov.io/gh/BurntBanana/checkpoint/)
+![Azure DevOps builds (branch)](https://img.shields.io/azure-devops/build/burntbanana/bf09ccc0-ee73-42e3-b92a-2e3ed1269966/1/master?style=flat&logo=azure-pipelines) ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/burntbanana/checkpoint/1/master?style=flat&logo=mocha) [![codecov](https://codecov.io/gh/BurntBanana/checkpoint/branch/master/graph/badge.svg)](https://codecov.io/gh/BurntBanana/checkpoint/)
 
 See features below. 
 Code Coverage graph: 
