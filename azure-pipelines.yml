@@ -1,5 +1,5 @@
 trigger:
-  - logger-test
+  - master
 
 strategy:
   matrix:
