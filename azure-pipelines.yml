@@ -1,5 +1,6 @@
 trigger:
-  - test
+  - logger-test
+
 strategy:
   matrix:
     linux:
@@ -32,10 +33,42 @@ steps:
     condition: eq(variables['Agent.OS'], 'Linux')
     
   - task: Npm@1
-    displayName: 'Run UI tests via npm script'
+    displayName: 'Run unit tests via npm script'
     inputs:
       command: custom
       verbose: false
-      customCommand: 'run ui-test'
+      customCommand: 'run test-coverage'
     env:
       DISPLAY: ":99.0"
+      
+  - task: PublishTestResults@2
+    displayName: 'Publish Test Results'
+    inputs:
+      testResultsFiles: 'out-cov/*-results.xml'
+      testRunTitle: '$(Agent.OS)-Tests'
+    condition: succeededOrFailed()
+
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish Code Coverage'
+    inputs:
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: coverage/cobertura-coverage.xml
+      reportDirectory: coverage/lcov-report
+    condition: succeededOrFailed()
+  
+  - bash: |
+      bash <(curl https://codecov.io/bash) -f coverage/cobertura-coverage.xml
+    displayName: 'Upload to codecov'
+    condition: succeededOrFailed()
+      
+  - task: CopyFiles@2
+    inputs:
+      sourceFolder: '$(Build.SourcesDirectory)/coverage'
+      targetFolder: $(Build.ArtifactStagingDirectory)
+    displayName: 'Copy coverage output'
+
+  - task: PublishPipelineArtifact@0
+    displayName: 'Publish Coverage Artifact'
+    inputs:
+      targetPath: $(Build.ArtifactStagingDirectory)
+      artifactName: 'coverage-$(Agent.OS)'

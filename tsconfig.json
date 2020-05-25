@@ -9,7 +9,7 @@
 		"sourceMap": true,
 		"rootDir": "src",
 		"strict": true,   /* enable all strict type-checking options */
-		"removeComments": true
+		"removeComments": false
 	},
 	"include": [
 		"src/**/*.ts",

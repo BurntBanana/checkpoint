@@ -10,14 +10,14 @@ describe('Logger', () => {
         silenceLogs(true);
     });
 
-    it('Should initialise logger with only console transport, if path is invalid', () => {
+    it('Should initialise logger with no transport, if path is invalid', () => {
         initLogger(join(__dirname, 'invalid', 'test'));
-        assert.equal(logger.transports.length, 2); //circular and console 
+        assert.equal(logger.transports.length, 0); //circular and console 
     });
 
-    it('Should initialise logger with console and file transport, if path is valid', () => {
+    it('Should initialise logger with file transports, if path is valid', () => {
         initLogger(__dirname);
-        assert.equal(logger.transports.length, 4); //circular, console, file, error file 
+        assert.equal(logger.transports.length, 2); //circular, console, file, error file 
     });
 
 });

@@ -13,8 +13,8 @@ describe('Extension', () => {
         extension.activate(context);
     });
 
-    it('Should initalise logger with console and file log', () => {
-        assert.equal(logger.transports.length, 4);
+    it('Should initalise logger with file log', () => {
+        assert.equal(logger.transports.length, 2);
     });
 
     it('Should register commenceTracking, openCheckpoint, deleteSingle, deleteAll and setActive commands', () => {
