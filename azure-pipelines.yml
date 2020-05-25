@@ -57,7 +57,7 @@ steps:
     condition: succeededOrFailed()
   
   - bash: |
-      bash <(curl https://codecov.io/bash) -f coverage/cobertura-coverage.xml
+      bash <(curl https://codecov.io/bash)
     displayName: 'Upload to codecov'
     condition: succeededOrFailed()
       
