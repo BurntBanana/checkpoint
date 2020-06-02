@@ -1,67 +1,130 @@
-# Checkpoint Visual Studio Code Extension
-![Azure DevOps builds (branch)](https://img.shields.io/azure-devops/build/burntbanana/bf09ccc0-ee73-42e3-b92a-2e3ed1269966/1/master?style=flat&logo=azure-pipelines) ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/burntbanana/checkpoint/1/master?style=flat&logo=mocha) [![codecov](https://codecov.io/gh/BurntBanana/checkpoint/branch/master/graph/badge.svg)](https://codecov.io/gh/BurntBanana/checkpoint/)
+<p align="center">
+  <a href="" rel="noopener">
+ <img width=200px height=200px src="media/logo.svg" alt="Project logo"></a>
+</p>
 
-See features below. 
-Code Coverage graph: 
-![Code Coverage graph](https://codecov.io/gh/BurntBanana/checkpoint/branch/master/graph/sunburst.svg "Code Coverage graph")
-## Features
+<h3 align="center">CheckPoint</h3>
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+<div align="center">
 
-For example if there is an image subfolder under your extension project workspace:
+  [![Azure DevOps builds (branch)](https://img.shields.io/azure-devops/build/burntbanana/bf09ccc0-ee73-42e3-b92a-2e3ed1269966/1/master?style=flat&logo=azure-pipelines)](https://dev.azure.com/burntbanana/checkpoint/_build)
+  ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/burntbanana/checkpoint/1/master?style=flat&logo=mocha)
+  [![codecov](https://codecov.io/gh/BurntBanana/checkpoint/branch/master/graph/badge.svg)](https://codecov.io/gh/BurntBanana/checkpoint/)
+  [![Automated Release Notes by gren](https://img.shields.io/badge/%F0%9F%A4%96-release%20notes-00B2EE.svg)](https://github-tools.github.io/github-release-notes/)
+  [![GitHub release (latest by date)](https://img.shields.io/github/v/release/burntbanana/checkpoint)](https://github.com/BurntBanana/checkpoint/releases/)
+  
+</div>
 
-\!\[feature X\]\(images/feature-x.png\)
+---
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+<p align="center"> Easy local file state tracking.
+    <br> 
+</p>
 
-## Requirements
+## 📝 Table of Contents
+- [About](#about)
+- [Getting Started](#getting_started)
+- [Deployment](#deployment)
+- [Usage](#usage)
+- [Built Using](#built_using)
+- [TODO](../TODO.md)
+- [Contributing](../CONTRIBUTING.md)
+- [Authors](#authors)
+- [Acknowledgments](#acknowledgement)
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## 🧐 About <a name = "about"></a>
+Write about 1-2 paragraphs describing the purpose of your project.
 
-## Extension Settings
+## 🏁 Getting Started <a name = "getting_started"></a>
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See [deployment](#deployment) for notes on how to deploy the project on a live system.
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+### Prerequisites
+What things you need to install the software and how to install them.
 
-Example:
+```
+Give examples
+```
 
-This extension contributes the following settings:
+### Installing
+A step by step series of examples that tell you how to get a development env running.
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+Say what the step will be
 
-## Known Issues
+```
+Give the example
+```
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+And repeat
 
-## Release Notes
+```
+until finished
+```
 
-Users appreciate release notes as you update your extension.
+End with an example of getting some data out of the system or using it for a little demo.
 
-### 1.0.0
+## 🔧 Running the tests <a name = "tests"></a>
+Explain how to run the automated tests for this system.
 
-Initial release of ...
+### Break down into end to end tests
+Explain what these tests test and why
 
-### 1.0.1
+```
+Give an example
+```
 
-Fixed issue #.
+### And coding style tests
+Explain what these tests test and why
 
-### 1.1.0
+```
+Give an example
+```
 
-Added features X, Y, and Z.
+## ☂ Code Coverage <a name = "code_coverage"></a>
+Explain how to run the automated tests for this system.
 
------------------------------------------------------------------------------------------------------------
+### Code coverage graph
 
-## Working with Markdown
+<div align="center">
+  
+  [![Code Coverage graph](https://codecov.io/gh/BurntBanana/checkpoint/branch/master/graph/sunburst.svg "Code Coverage graph")](https://codecov.io/gh/BurntBanana/checkpoint/)
 
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
+</div>
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
+## 🎈 Usage <a name="usage"></a>
+Add notes about how to use the system.
 
-### For more information
+## 🚀 Deployment <a name = "deployment"></a>
+Add additional notes about how to deploy this on a live system.
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+## ⛏️ Built Using <a name = "built_using"></a>
+- [Visual Studio Code](https://code.visualstudio.com/) - Code Editor
+- [NodeJS](https://nodejs.org/en/) - Backend
+- [Diff Patch Match](https://github.com/google/diff-match-patch) - File change computation
+- [Mocha](https://mochajs.org/) - Tests
+- [VSCode Extension Tester](https://github.com/redhat-developer/vscode-extension-tester) - UI tests
+- [Istanbul](https://istanbul.js.org/) - Code Coverage
+- [dateFormat](https://www.npmjs.com/package/dateformat) - Date Formatting
+- [Winston](https://www.npmjs.com/package/winston) - Logging
+- [Webpack](https://webpack.js.org/) - Code packing
+- [Method Draw](https://editor.method.ac/) - SVG editor
+- [codecov.io](https://codecov.io/) - Code coverage analysis
+- [shields.io](https://shields.io/) - Badges
+- [Azure DevOps](https://azure.microsoft.com/en-in/services/devops/) - Build & Release pipelines
+- [Azure Boards](https://azure.microsoft.com/en-in/services/devops/boards/) - Work item tracking
+- [gren](https://github.com/github-tools/github-release-notes) - Release Notes
 
-**Enjoy!**
+## ✍️ Authors <a name = "authors"></a>
+- [@adershmanoj](https://github.com/adershmanoj)
+- [@alexthomas96](https://github.com/alexthomas96)
+
+See also the list of [contributors](https://github.com/kylelobo/The-Documentation-Compendium/contributors) who participated in this project.
+
+## 🎉 Acknowledgements <a name = "acknowledgement"></a>
+- Hat tip to anyone whose code was used
+- Inspiration
+- References
+- [Tree View base code](https://github.com/microsoft/vscode-extension-samples/tree/master/tree-view-sample)
+- [Webpack base code](https://github.com/microsoft/vscode-extension-samples/tree/master/webpack-sample)
+- [Icons & Logos (based off)](https://www.flaticon.com/authors/freepik)
+- [Code coverage reference](https://github.com/aaronpowell/vscode-profile-switcher)
+- [README Template](https://github.com/kylelobo/The-Documentation-Compendium/blob/master/en/README_TEMPLATES/Standard.md)
