@@ -4,6 +4,7 @@
 	"description": "Easy file state tracking",
 	"version": "0.0.1",
 	"publisher": "BurntBanana",
+	"icon": "media/logo.png",
 	"repository": "https://github.com/BurntBanana/checkpoint",
 	"engines": {
 		"vscode": "^1.44.0"

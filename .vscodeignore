@@ -2,6 +2,8 @@
 .vscode-test/**
 out/**
 src/**
+media/*.gif
+media/*.svg
 .gitignore
 vsc-extension-quickstart.md
 **/tsconfig.json
@@ -9,6 +11,5 @@ vsc-extension-quickstart.md
 **/*.map
 **/*.ts
 node_modules/**
-*.md
 test-resources/**
 *.vsix

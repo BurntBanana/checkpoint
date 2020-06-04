@@ -1,74 +1,110 @@
 trigger:
-  - master
+  tags:
+    include:
+    - v*
+  branches:
+    include:
+    - develop
+stages:
+  - stage: Test
+    displayName: "Cross Platform Testing"
+    jobs:
+    - job: "test"
+      displayName: "Test extension"
+      strategy:
+        matrix:
+          linux:
+            imageName: "ubuntu-latest"
+          mac:
+            imageName: "macOS-latest"
+          windows:
+            imageName: "windows-latest"
+      pool:
+        vmImage: $(imageName)
+      steps:
+      - task: NodeTool@0
+        inputs:
+          versionSpec: "10.x"
+        displayName: "Install Node.js"
 
-strategy:
-  matrix:
-    linux:
-      imageName: "ubuntu-latest"
-    mac:
-      imageName: "macOS-latest"
-    windows:
-      imageName: "windows-latest"
+      - task: Npm@1
+        displayName: "Install CheckPoint dependencies"
+        inputs:
+          verbose: false
+          command: install
 
-pool:
-  vmImage: $(imageName)
+      - script: |
+          set -e
+          /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          disown -ar
+        displayName: "Start xvfb"
+        condition: eq(variables['Agent.OS'], 'Linux')
 
-steps:
-  - task: NodeTool@0
-    inputs:
-      versionSpec: "10.x"
-    displayName: "Install Node.js"
+      - task: Npm@1
+        displayName: "Run unit tests via npm script"
+        inputs:
+          command: custom
+          verbose: false
+          customCommand: "run test-coverage"
+        env:
+          DISPLAY: ":99.0"
 
-  - task: Npm@1
-    displayName: 'Install CheckPoint dependencies'
-    inputs:
-      verbose: false
-      command: install
-      
-  - script: |
-      set -e
-      /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-      disown -ar
-    displayName: 'Start xvfb'
-    condition: eq(variables['Agent.OS'], 'Linux')
-    
-  - task: Npm@1
-    displayName: 'Run unit tests via npm script'
-    inputs:
-      command: custom
-      verbose: false
-      customCommand: 'run test-coverage'
-    env:
-      DISPLAY: ":99.0"
-      
-  - task: PublishTestResults@2
-    displayName: 'Publish Test Results'
-    inputs:
-      testResultsFiles: 'out-cov/*-results.xml'
-      testRunTitle: '$(Agent.OS)-Tests'
-    condition: succeededOrFailed()
+      - task: PublishTestResults@2
+        displayName: "Publish Test Results"
+        inputs:
+          testResultsFiles: "out-cov/*-results.xml"
+          testRunTitle: "$(Agent.OS)-Tests"
+        condition: succeededOrFailed()
 
-  - task: PublishCodeCoverageResults@1
-    displayName: 'Publish Code Coverage'
-    inputs:
-      codeCoverageTool: 'Cobertura'
-      summaryFileLocation: coverage/cobertura-coverage.xml
-      reportDirectory: coverage/lcov-report
-    condition: succeededOrFailed()
-  
-  - bash: |
-      bash <(curl https://codecov.io/bash)
-    displayName: 'Upload to codecov'
-    condition: succeededOrFailed()
-      
-  - task: CopyFiles@2
-    inputs:
-      sourceFolder: '$(Build.SourcesDirectory)/coverage'
-      targetFolder: $(Build.ArtifactStagingDirectory)
-    displayName: 'Copy coverage output'
+      - task: PublishCodeCoverageResults@1
+        displayName: "Publish Code Coverage"
+        inputs:
+          codeCoverageTool: "Cobertura"
+          summaryFileLocation: coverage/cobertura-coverage.xml
+          reportDirectory: coverage/lcov-report
+        condition: succeededOrFailed()
 
-  - task: PublishPipelineArtifact@0
-    displayName: 'Publish Coverage Artifact'
-    inputs:
-      targetPath: $(Build.ArtifactStagingDirectory)
-      artifactName: 'coverage-$(Agent.OS)'
+      - bash: |
+          bash <(curl https://codecov.io/bash)
+        displayName: "Upload to codecov"
+        condition: succeededOrFailed()
+
+  - stage: Package
+    displayName: 'Package extension'
+    condition: succeeded()
+    jobs:
+    - job: package
+      displayName: 'Package extension on Linux'
+      pool:
+        vmImage: "ubuntu-latest"
+      steps:
+        - task: NodeTool@0
+          inputs:
+            versionSpec: "10.x"
+          displayName: "Install Node.js"
+
+        - task: Npm@1
+          displayName: "Install CheckPoint dependencies"
+          inputs:
+            verbose: false
+            command: install
+
+        - script: |
+            npx vsce package -o $(Build.ArtifactStagingDirectory)/release.vsix
+          displayName: 'Create vsix'
+
+        - task: Bash@3
+          displayName: 'Create release notes'
+          inputs:
+            targetType: 'inline'
+            script: |
+              npm install github-release-notes -g
+              gren changelog -T $TOKEN
+              cp CHANGELOG.md $(Build.ArtifactStagingDirectory)/releaseNotes.md
+        
+        - task: PublishPipelineArtifact@0
+          displayName: 'Publish Release Artifacts'
+          inputs:
+            targetPath: $(Build.ArtifactStagingDirectory)
+            artifactName: 'Release artifacts'
+          condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
