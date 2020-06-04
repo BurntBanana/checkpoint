@@ -1,6 +1,6 @@
 <p align="center">
   <a href="" rel="noopener">
- <img width=200px height=200px src="https://github.com/BurntBanana/checkpoint/blob/master/media/logo.png" alt="Project logo"></a>
+ <img width=200px height=200px src="https://raw.githubusercontent.com/BurntBanana/checkpoint/master/media/logo.png" alt="Project logo"></a>
 </p>
 
 <h3 align="center">CheckPoint</h3>
@@ -37,7 +37,7 @@
 CheckPoint is a Visual Studio Code extension to track file change history from an easy to use graphical interface.  
 File changes are marked as milestones called `checkpoints`. Easily navigate between checkpoints on click and set file contents to reflect any desired state.  
 Let's end the torture of having to continuously jab the undo button! ;)
-<div align="center"><img src="https://github.com/BurntBanana/checkpoint/blob/master/media/about.gif" alt="Demo" /></div>
+<div align="center"><img src="https://raw.githubusercontent.com/BurntBanana/checkpoint/master/media/about.gif" alt="Demo" /></div>
 
 ## 🏁 Installation <a name = "install"></a>
 Here's how to get CheckPoint up and running.
@@ -56,28 +56,28 @@ Activate CheckPoint by clicking the 🏁 icon on the activity bar.
 The green circle icon indicates the active `checkpoint`. 
 ### Commence Tracking 
 Start tracking file changes by pressing the `Commence tracking` button in the sidebar. This initializes a new `checkpoint` for the active file in the editor. 
-<div align="center"><img src="https://github.com/BurntBanana/checkpoint/blob/master/media/commence.gif" alt="Commence tracking demo" /></div>
+<div align="center"><img src="https://raw.githubusercontent.com/BurntBanana/checkpoint/master/media/commence.gif" alt="Commence tracking demo" /></div>
 
 ### Save active file state
 Once tracking has been commenced, simply save the file to create a new `checkpoint`.
-<div align="center"><img src="https://github.com/BurntBanana/checkpoint/blob/master/media/save.gif" alt="Save checkpoint demo" /></div>
+<div align="center"><img src="https://raw.githubusercontent.com/BurntBanana/checkpoint/master/media/save.gif" alt="Save checkpoint demo" /></div>
 
 ### Access saved state
 Click on any `checkpoint` in the sidebar to view the state in the editor. This action does not change the file content, it only modifies the content in the editor.
 Unsaved changes in the active file will be stored as a new `checkpoint`. 
-<div align="center"><img src="https://github.com/BurntBanana/checkpoint/blob/master/media/open.gif" alt="Open checkpoint demo" /></div>
+<div align="center"><img src="https://raw.githubusercontent.com/BurntBanana/checkpoint/master/media/open.gif" alt="Open checkpoint demo" /></div>
 
 ### Change file content to a saved state
 Click on the ⚡ button next to any `checkpoint` to set file content to the required state. This will modify the file to reflect the selected state.
-<div align="center"><img src="https://github.com/BurntBanana/checkpoint/blob/master/media/active.gif" alt="Set active checkpoint demo" /></div>
+<div align="center"><img src="https://raw.githubusercontent.com/BurntBanana/checkpoint/master/media/active.gif" alt="Set active checkpoint demo" /></div>
 
 ### Delete saved state
 Click on the 🗑️ ️button next to any `checkpoint` to delete the saved state. 
-<div align="center"><img src="https://github.com/BurntBanana/checkpoint/blob/master/media/deleteSingle.gif" alt="Delete single checkpoint demo" /></div>
+<div align="center"><img src="https://raw.githubusercontent.com/BurntBanana/checkpoint/master/media/deleteSingle.gif" alt="Delete single checkpoint demo" /></div>
 
 ### Delete all saved states
 Click on the 🗑️ ️button at the top of the sidebar to remove all saved states for the active file. 
-<div align="center"><img src="https://github.com/BurntBanana/checkpoint/blob/master/media/deleteAll.gif" alt="Delete all checkpoints demo" /></div>
+<div align="center"><img src="https://raw.githubusercontent.com/BurntBanana/checkpoint/master/media/deleteAll.gif" alt="Delete all checkpoints demo" /></div>
 
 
 ## 🔧 Build from source <a name = "local"></a>
