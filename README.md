@@ -93,7 +93,7 @@ npm install
 ``` 
 - Run the extension from Visual Studio Code 
 ``` 
-Run tab → Run extension 
+Run → Run extension 
 ``` 
 ### Unit testing 
 Run mocha tests for CheckPoint.<br>
@@ -108,7 +108,7 @@ or<br>
 > UI tests have been tested on Windows platform only and may give inconsistent results for other platforms.  
 ## ☂ Code Coverage <a name = "code_coverage"></a>
 Run coverage tests with `npm run test-coverage` from the command line. 
->codecov.io provides highly integrated tools to group, merge, archive, and compare coverage reports.
+>[codecov.io](https://codecov.io/) provides highly integrated tools to group, merge, archive, and compare coverage reports.
 
 Coverage results obtained from coverage tests can be uploaded to [codecov.io](https://codecov.io/) to obtain coverage report and graphs. 
 
