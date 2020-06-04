@@ -156,7 +156,7 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 
 ## ✍️ Authors <a name = "authors"></a>
 - [@adershmanoj](https://github.com/adershmanoj)
-- [@BurntBanana](https://github.com/BurntBanana)
+- [@alexthomas96](https://github.com/alexthomas96)
 
 See also the list of [contributors](https://github.com/burntbanana/checkpoint/contributors) who participated in this project.
 

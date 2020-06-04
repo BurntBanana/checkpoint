@@ -6,9 +6,9 @@
 	"publisher": "BurntBanana",
 	"icon": "media/logo.png",
 	"repository": {
-        "type": "git",
-        "url": "https://github.com/BurntBanana/checkpoint"
-    },
+		"type": "git",
+		"url": "https://github.com/BurntBanana/checkpoint"
+	},
 	"engines": {
 		"vscode": "^1.44.0"
 	},
