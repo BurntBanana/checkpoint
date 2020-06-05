@@ -2,7 +2,7 @@
 	"name": "checkpoint",
 	"displayName": "CheckPoint",
 	"description": "Easy file state tracking",
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"publisher": "BurntBanana",
 	"icon": "media/logo.png",
 	"repository": {
@@ -11,7 +11,7 @@
 	},
 	"bugs": {
 		"url": "https://github.com/BurntBanana/checkpoint/issues"
-	  },
+	},
 	"license": "SEE LICENSE IN LICENSE",
 	"engines": {
 		"vscode": "^1.44.0"
@@ -28,7 +28,7 @@
 		"stash",
 		"git",
 		"track"
-	  ],
+	],
 	"activationEvents": [
 		"onView:checkPointExplorer"
 	],
