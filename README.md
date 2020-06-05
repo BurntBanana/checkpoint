@@ -36,6 +36,7 @@
 ## 🧐 About <a name = "about"></a>
 CheckPoint is a Visual Studio Code extension to track file change history from an easy to use graphical interface.  
 File changes are marked as milestones called `checkpoints`. Easily navigate between checkpoints on click and set file contents to reflect any desired state.  
+`checkpoints` are intelligently computed with only the file changes being stored making it ideal for large documents as well.
 Let's end the torture of having to continuously jab the undo button! ;)
 <div align="center"><img src="https://raw.githubusercontent.com/BurntBanana/checkpoint/master/media/about.gif" alt="Demo" /></div>
 
@@ -50,6 +51,11 @@ You can get it [here](https://code.visualstudio.com/download).
 - Search for `burntbanana.checkpoint`
 - Click **Install**
 - Click **Reload**, if required
+
+### Extension Settings
+ - **Interval**: Interval to save full file content.
+ - **Log File**: File name for extension logs.
+ - **Error Log File**: File name for extension error logs.
 
 ## 🎈 Usage <a name="usage"></a>
 Activate CheckPoint by clicking the 🏁 icon on the activity bar.
