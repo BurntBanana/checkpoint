@@ -2,7 +2,7 @@
 	"name": "checkpoint",
 	"displayName": "CheckPoint",
 	"description": "Easy file state tracking",
-	"version": "0.0.0",
+	"version": "1.0.0",
 	"publisher": "BurntBanana",
 	"icon": "media/logo.png",
 	"repository": {
