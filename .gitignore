@@ -6,4 +6,3 @@ dist
 test-resources/
 coverage
 out-cov
-package-lock.json
