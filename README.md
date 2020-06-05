@@ -36,7 +36,7 @@
 ## 🧐 About <a name = "about"></a>
 CheckPoint is a Visual Studio Code extension to track file change history from an easy to use graphical interface.  
 File changes are marked as milestones called `checkpoints`. Easily navigate between checkpoints on click and set file contents to reflect any desired state.  
-`checkpoints` are intelligently computed with only the file changes being stored making it ideal for large documents as well.
+`checkpoints` are intelligently computed with only the file changes being stored making it ideal for large documents as well.  
 Let's end the torture of having to continuously jab the undo button! ;)
 <div align="center"><img src="https://raw.githubusercontent.com/BurntBanana/checkpoint/master/media/about.gif" alt="Demo" /></div>
 
