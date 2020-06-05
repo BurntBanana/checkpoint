@@ -15,8 +15,8 @@ module.exports = {
         label: "[**{{label}}**]",   
         noLabel: "closed",
         group: "\n#### {{heading}}\n",
-        changelogTitle: "# Changelog\n\n",
-        release: "## {{release}} ({{date}})\n" + fs.readFileSync('test') + "\n{{body}}",
+        changelogTitle: "",
+        release: fs.readFileSync('release_summary.md') + "\n\n## Changes:\n{{body}}",
         releaseSeparator: "\n---\n\n"
     }
 }
