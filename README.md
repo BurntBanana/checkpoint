@@ -10,6 +10,7 @@
 
 <div align="center">
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/46edce22a01f4accba58d79bea14566d)](https://app.codacy.com/gh/BurntBanana/checkpoint?utm_source=github.com&utm_medium=referral&utm_content=BurntBanana/checkpoint&utm_campaign=Badge_Grade_Dashboard)
   [![Azure DevOps builds (branch)](https://img.shields.io/azure-devops/build/burntbanana/bf09ccc0-ee73-42e3-b92a-2e3ed1269966/1/master?style=flat&logo=azure-pipelines)](https://dev.azure.com/burntbanana/checkpoint/_build)
   ![Azure DevOps tests](https://img.shields.io/azure-devops/tests/burntbanana/checkpoint/1/master?style=flat&logo=mocha)
   [![codecov](https://codecov.io/gh/BurntBanana/checkpoint/branch/master/graph/badge.svg)](https://codecov.io/gh/BurntBanana/checkpoint/)
