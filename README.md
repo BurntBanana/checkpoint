@@ -1,6 +1,6 @@
 <p align="center">
   <a href="" rel="noopener">
- <img width=200px height=200px src="https://raw.githubusercontent.com/BurntBanana/checkpoint/master/media/logo.png" alt="Project logo"></a>
+ <img width=200px height=200px src="media/logo.png" alt="Project logo"></a>
 </p>
 
 <h3 align="center">CheckPoint</h3>
@@ -15,6 +15,7 @@
   [![codecov](https://codecov.io/gh/BurntBanana/checkpoint/branch/master/graph/badge.svg)](https://codecov.io/gh/BurntBanana/checkpoint/)
   [![Automated Release Notes by gren](https://img.shields.io/badge/%F0%9F%A4%96-release%20notes-00B2EE.svg)](https://github-tools.github.io/github-release-notes/)
   [![GitHub release (latest by date)](https://img.shields.io/github/v/release/burntbanana/checkpoint)](https://github.com/BurntBanana/checkpoint/releases/)
+  [![Codacy Badge](https://app.codacy.com/project/badge/Grade/689be0c956314b1db4a2a07863a92fe9)](https://www.codacy.com/gh/BurntBanana/checkpoint?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=BurntBanana/checkpoint&amp;utm_campaign=Badge_Grade)
   
 </div>
 
@@ -156,9 +157,11 @@ NOTE: Be sure to merge the latest from "upstream" before making a pull request!
 - [Method Draw](https://editor.method.ac/) - SVG editor
 - [codecov.io](https://codecov.io/) - Code coverage analysis
 - [shields.io](https://shields.io/) - Badges
+- [Codacy](https://www.codacy.com/) - Automated code reviews & code analytics
 - [Azure DevOps](https://azure.microsoft.com/en-in/services/devops/) - Build & Release pipelines
 - [Azure Boards](https://azure.microsoft.com/en-in/services/devops/boards/) - Work item tracking
 - [gren](https://github.com/github-tools/github-release-notes) - Release Notes
+
 
 ## ✍️ Authors <a name = "authors"></a>
 - [@adershmanoj](https://github.com/adershmanoj)

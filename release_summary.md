@@ -1,16 +1,5 @@
 ## Summary
-- Initial release
-- Track file changes with the `Commence Tracking` button
-- Add a new `checkpoint` when file is saved
-- Open `checkpoint` and load saved state on click
-- Set a particular `checkpoint` as active using ⚡ context button
-- Delete a particular `checkpoint` using the 🗑️ context button
-- Delete all `checkpoints` using the 🗑️ button at the top of the sidebar
-- Load `checkpoints` on active editor change
-- Webpack used for code packing
-- Implemented unit tests using mocha
-- Implemented UI tests using VSCode Extension Tester
-- Implemented coverage results using Instanbul
-- Setup build and release piplelines on Azure Devops
-- Setup release notes config file (gren)
-- Add MIT license file
+- Updated lodash to 4.17.19 to fix [security vulnerability](https://github.com/advisories/GHSA-p6mc-m468-83gw)
+- Edited grenrc for proper formatting of commit hash
+- Added codecov pull request comment
+- Added codacy badge

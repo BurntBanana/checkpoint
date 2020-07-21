@@ -10,7 +10,7 @@ module.exports = {
     "generate": true,
     "includeMessages": "all",
     "template": {
-        commit: ({ message, url, author, name }) => `- **${message}** - [${url.substring(url.lastIndexOf('/') + 1)}](${url}) - ${author ? `[${author}](https://github.com/${author})` : name}`,
+        commit: ({ message, url, author, name }) => `- **${message}** - ${url.substring(url.lastIndexOf('/') + 1)} - ${author ? `[${author}](https://github.com/${author})` : name}`,
         issue: "- {{labels}} {{name}} [{{text}}]({{url}})",
         label: "[**{{label}}**]",   
         noLabel: "closed",
